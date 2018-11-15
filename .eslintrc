@@ -1,0 +1,57 @@
+{
+  "extends":  "eslint-config-airbnb",
+  "env" : {
+    "browser": true,
+    "node": true
+  },
+  "overrides": [{
+    "files": ["test/**"],
+    "env" : {
+      "mocha": true
+    }
+  }],
+  "plugins": [
+    "import",
+    "jsx-a11y",
+    "react"
+  ],
+  "rules": {
+    "arrow-parens": 0,
+    "comma-dangle": 0,
+    "func-names": 0,
+    "function-paren-newline": 0,
+    "import/extensions": 0,
+    "indent": [2, 2, {"SwitchCase": 1}],
+    "keyword-spacing": [2, {
+      "overrides": {
+        "if": { "after": false },
+        "for": { "after": false },
+        "while": { "after": false },
+        "switch": { "after": false }
+      }
+    }],
+    "no-alert": 0,
+    "no-console": 0,
+    "no-param-reassign": 0,
+    "no-plusplus": [2, { "allowForLoopAfterthoughts": true }],
+    "no-bitwise": 0,
+    "object-curly-newline": 0,
+    "object-shorthand": [2, "properties"],
+    "quote-props": [2, "consistent"],
+    "jsx-a11y/anchor-is-valid": [ 2, { "specialLink": [ "to" ] }],
+    "jsx-a11y/label-has-for": [ 2, {
+      "required": {
+          "every": [ "id" ]
+      }
+    }],
+    "jsx-a11y/no-autofocus": 0,
+    "react/forbid-component-props": [1, { "forbid": ["style"] }],
+    "react/forbid-dom-props": [1, { "forbid": ["style"] }],
+    "react/no-did-mount-set-state": 0,
+    "react/no-multi-comp": 0,
+    "react/prop-types": 0,
+    "react/sort-comp": 0,
+    "react/jsx-filename-extension": 0,
+    "space-before-function-paren": [2, "never"]
+  }
+}

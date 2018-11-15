@@ -1,0 +1,8 @@
+@import 'evergreen-variables.css';
+
+.Sidebar {
+  width: 240px;
+  padding: 24px;
+  overflow-y: auto;
+  background-color: var(--N2);
+}
