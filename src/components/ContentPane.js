@@ -7,6 +7,8 @@ import 'react-resizable/css/styles.css';
 
 import ContentPaneStyle from '../styles/ContentPane.css';
 
+import PlotlyPlot from './PlotlyPlot';
+
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 
@@ -14,7 +16,7 @@ const ContentPane = () => (
   <section className={ContentPaneStyle.ContentPane}>
     <ResponsiveGridLayout style={{ width: '100%' }} rowHeight={100} width={1200}>
       <div key="1" className={ContentPaneStyle.Frame} data-grid={{ w: 3, h: 3, x: 0, y: 0 }}>
-        <div style={{padding: 8}}>1</div>
+        <PlotlyPlot />
       </div>
       <div key="2" className={ContentPaneStyle.Frame} data-grid={{ w: 3, h: 3, x: 3, y: 0 }}>
         <div style={{padding: 8}}>2</div>
