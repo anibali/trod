@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { Component } from 'react';
+import { connect } from 'react-redux';
 
 import { Responsive, WidthProvider } from 'react-grid-layout';
 
@@ -7,32 +8,40 @@ import 'react-resizable/css/styles.css';
 
 import ContentPaneStyle from '../styles/ContentPane.css';
 
-import PlotlyPlot from './PlotlyPlot';
+import TraceView from './TraceView';
+import { viewActions } from '../store/actions';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 
-const ContentPane = () => (
-  <section className={ContentPaneStyle.ContentPane}>
-    <ResponsiveGridLayout style={{ width: '100%' }} rowHeight={100} width={1200}>
-      <div key="1" className={ContentPaneStyle.Frame} data-grid={{ w: 3, h: 3, x: 0, y: 0 }}>
-        <PlotlyPlot />
+class ContentPane extends Component {
+  componentDidMount() {
+    const { fetchViews } = this.props;
+    fetchViews();
+  }
+
+  render() {
+    const { views } = this.props;
+    const viewComponents = views.items.map((view, i) => (
+      <div key={view.id} className={ContentPaneStyle.Frame}
+           data-grid={{w: 3, h: 3, x: 3 * (i % 4), y: 3 * Math.floor(i / 4)}}>
+        <TraceView view={view}/>
       </div>
-      <div key="2" className={ContentPaneStyle.Frame} data-grid={{ w: 3, h: 3, x: 3, y: 0 }}>
-        <div style={{padding: 8}}>2</div>
-      </div>
-      <div key="3" className={ContentPaneStyle.Frame} data-grid={{ w: 3, h: 3, x: 6, y: 0 }}>
-        <div style={{padding: 8}}>3</div>
-      </div>
-      <div key="4" className={ContentPaneStyle.Frame} data-grid={{ w: 3, h: 3, x: 9, y: 0 }}>
-        <div style={{padding: 8}}>4</div>
-      </div>
-      <div key="5" className={ContentPaneStyle.Frame} data-grid={{ w: 3, h: 3, x: 0, y: 3 }}>
-        <div style={{padding: 8}}>5</div>
-      </div>
-    </ResponsiveGridLayout>
-  </section>
-);
+    ));
+    return (
+      <section className={ContentPaneStyle.ContentPane}>
+        <ResponsiveGridLayout style={{ width: '100%' }} rowHeight={100} width={1200}>
+          {viewComponents}
+        </ResponsiveGridLayout>
+      </section>
+    );
+  }
+}
 
 
-export default ContentPane;
+export default connect(
+  (state) => ({ views: state.views }),
+  (dispatch) => ({
+    fetchViews: (...args) => dispatch(viewActions.fetch(...args)),
+  })
+)(ContentPane);

@@ -1,22 +1,14 @@
-#!/usr/bin/env node
+import http from 'http';
 
-require('@babel/register')({
-  presets: [
-    [require.resolve('@babel/preset-env'), {
-      targets: { node: 'current' }
-    }],
-    require.resolve('@babel/preset-react')
-  ]
-});
-
-const http = require('http');
-
-const createApp = require('./createApp').default;
+import createApp from './createApp';
 
 
-createApp().then((app) => {
-  const server = http.createServer(app);
-  server.listen(3000, () => {
-    console.log('Server started.');
+// Server main function
+export default () => {
+  createApp().then((app) => {
+    const server = http.createServer(app);
+    server.listen(3000, () => {
+      console.log('Server started.');
+    });
   });
-});
+};

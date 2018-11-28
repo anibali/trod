@@ -7,7 +7,6 @@ import Plotly from '../helpers/plotlyCustom';
 class PlotlyPlot extends React.PureComponent {
   constructor(props) {
     super(props);
-
     this.PlotlyComponent = createPlotlyComponent(Plotly);
   }
 
@@ -19,11 +18,7 @@ class PlotlyPlot extends React.PureComponent {
       <div ref={this.props.measureRef} style={{ height: '100%' }}>
         <PlotlyComponent
           onInitialized={this.onInitialized}
-          data={[{
-            x: [1, 2, 3, 4],
-            y: [10, 15, 13, 17],
-            type: 'scatter'
-          }]}
+          data={this.props.data}
           layout={{ width, height, margin: { l: 40, r: 40, t: 50, b: 40 } }}
           fit={false}
         />

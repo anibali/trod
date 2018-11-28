@@ -1,12 +1,10 @@
 @import 'evergreen-variables.css';
 
+@import 'react-grid-layout.global.css';
+
 body {
   margin: 0;
   -webkit-text-size-adjust: 100%;
   color: var(--neutral-base);
   font-family: var(--font-ui);
-}
-
-:global .react-grid-item.react-grid-placeholder {
-  background-color: var(--N10);
 }

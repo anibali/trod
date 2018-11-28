@@ -11,7 +11,7 @@
     "test": "NODE_ENV=test mocha"
   },
   "bin": {
-    "trod": "src/server.js"
+    "trod": "src/serverEntry.js"
   },
   "dependencies": {
     "@babel/core": "7.1.6",
@@ -19,20 +19,34 @@
     "@babel/preset-env": "7.1.6",
     "@babel/preset-react": "7.0.0",
     "@babel/register": "7.0.0",
+    "axios": "0.18.0",
     "evergreen-ui": "4.6.0",
     "express": "4.16.4",
+    "icepick": "2.3.1",
+    "js-yaml": "3.12.0",
+    "lodash": "4.17.11",
     "plotly.js": "1.42.5",
     "react": "16.6.3",
     "react-dom": "16.6.3",
     "react-grid-layout": "0.16.6",
     "react-measure": "2.1.3",
-    "react-plotly.js": "2.2.0"
+    "react-plotly.js": "2.2.0",
+    "react-redux": "5.1.1",
+    "react-resizable": "1.7.5",
+    "redux": "4.0.1",
+    "redux-actions": "2.6.4",
+    "redux-thunk": "2.3.0"
   },
   "devDependencies": {
     "babel-loader": "8.0.4",
     "css-loader": "1.0.1",
-    "mocha": "5.2.0",
+    "eslint": "5.9.0",
+    "eslint-config-airbnb": "17.1.0",
+    "eslint-plugin-import": "2.14.0",
+    "eslint-plugin-jsx-a11y": "6.1.2",
+    "eslint-plugin-react": "7.11.1",
     "mini-css-extract-plugin": "0.4.4",
+    "mocha": "5.2.0",
     "nodemon-webpack-plugin": "4.0.3",
     "postcss-css-variables": "0.11.0",
     "postcss-import": "12.0.1",

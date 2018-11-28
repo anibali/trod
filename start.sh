@@ -3,8 +3,8 @@
 # Start the server
 if [ "$NODE_ENV" == "production" ]
 then
-  node src/server.js
+  node src/serverEntry.js
 else
   rm -f dist/*
-  yarn exec -- webpack --mode=development -w
+  yarn exec -- webpack -w
 fi

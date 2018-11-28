@@ -4,17 +4,28 @@ const NodemonPlugin = require('nodemon-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AssetsManifestPlugin = require('webpack-assets-manifest');
 const CleanObsoleteChunksPlugin = require('webpack-clean-obsolete-chunks');
+const getLocalIdent = require('css-loader/lib/getLocalIdent');
+const postcssImport = require('postcss-import');
+const postcssVariables = require('postcss-css-variables');
+const postcssPresetEnv = require('postcss-preset-env');
 
 
-const nodeEnv = process.env.NODE_ENV || 'development';
+// Determine whether we are in development or production mode.
+const possibleModes = ['development', 'production'];
+const mode = process.env.NODE_ENV || 'development';
+console.assert(possibleModes.includes(mode));
+
 const nodeModulesPath = process.env.NODE_PATH || 'node_modules';
+
+// Supported browsers (in the Browserslist config format).
+const browsers = ['last 2 versions', 'ie >= 9', 'safari >= 7'];
 
 const plugins = {
   any: [
     new webpack.DefinePlugin({
       'process.env': {
         IN_BROWSER: JSON.stringify(true),
-        NODE_ENV: JSON.stringify(nodeEnv),
+        NODE_ENV: JSON.stringify(mode),
       },
     }),
     new MiniCssExtractPlugin({
@@ -29,17 +40,18 @@ const plugins = {
   production: [],
   development: [
     new NodemonPlugin({
-      script: 'src/server.js',
+      script: 'src/serverEntry.js',
       watch: [path.resolve('src')],
     }),
     new CleanObsoleteChunksPlugin({ deep: true }),
   ],
-  test: []
 };
 
+
 module.exports = {
+  mode,
   entry: {
-    app: ['./src/client.js', './src/styles/main.css'],
+    app: ['./src/clientEntry.js', './src/styles/main.global.css'],
   },
   output: {
     path: path.join(__dirname, 'dist'),
@@ -47,24 +59,27 @@ module.exports = {
     chunkFilename: '[name]-[chunkhash].js',
     publicPath: '/assets/'
   },
-  plugins: plugins.any.concat(plugins[nodeEnv] || []),
+  plugins: plugins.any.concat(plugins[mode]),
   module: {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules/,
+        exclude: /node_modules\/(?!(icepick)\/).*/,
+        include: [
+          path.resolve('src'),
+          path.resolve('node_modules', 'icepick'),
+        ],
         use: [
           {
             loader: 'babel-loader',
             options: {
               babelrc: false,
+              sourceType: 'unambiguous',
               presets: [
                 ['@babel/preset-env', {
                   modules: false,
                   useBuiltIns: 'usage',
-                  targets: {
-                    browsers: ['last 2 versions', 'ie >= 9', 'safari >= 7']
-                  }
+                  targets: { browsers }
                 }],
                 '@babel/preset-react'
               ],
@@ -77,16 +92,23 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           { loader: MiniCssExtractPlugin.loader },
-          { loader: 'css-loader', options: { modules: true, localIdentName: '[local]--[hash:base64:9]' } },
+          {
+            loader: 'css-loader',
+            options: {
+              modules: true,
+              localIdentName: '[local]--[hash:base64:9]',
+              getLocalIdent: (loaderContext, localIdentName, localName, options) => (
+                loaderContext.resourcePath.endsWith('.global.css')
+                  ? localName
+                  : getLocalIdent(loaderContext, localIdentName, localName, options)
+              )
+            }
+          },
           {
             loader: 'postcss-loader',
             options: {
               ident: 'postcss',
-              plugins: [
-                require('postcss-import')(),
-                require('postcss-css-variables')(),
-                require('postcss-preset-env')({ browsers: ['last 2 versions', 'ie >= 9', 'safari >= 7'] }),
-              ]
+              plugins: [postcssImport(), postcssVariables(), postcssPresetEnv({ browsers })]
             }
           }
         ]
