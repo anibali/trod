@@ -5,20 +5,20 @@
  *   - Doesn't call other action creators
  */
 
-import { createActions } from 'redux-actions';
+// import { createActions } from 'redux-actions';
+//
+//
+// const simpleActions = createActions({
+//   TROD: {
+//     TRACES: {},
+//     VIEWS: {}
+//   }
+// });
+//
+//
+// export const traceActions = simpleActions.trod.traces;
+// export const viewActions = simpleActions.trod.views;
 
-
-const simpleActions = createActions({
-  TROD: {
-    TRACES: {
-      ADD: trace => ({ trace }),
-    },
-    VIEWS: {
-      SET: views => ({ views }),
-    }
-  }
-});
-
-
-export const traceActions = simpleActions.trod.traces;
-export const viewActions = simpleActions.trod.views;
+export const traceActions = {};
+export const traceDataActions = {};
+export const viewActions = {};

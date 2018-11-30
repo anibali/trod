@@ -16,8 +16,8 @@ const ResponsiveGridLayout = WidthProvider(Responsive);
 
 class ContentPane extends Component {
   componentDidMount() {
-    const { fetchViews } = this.props;
-    fetchViews();
+    const { fetchViews, experiment } = this.props;
+    fetchViews(experiment.id);
   }
 
   render() {
@@ -42,6 +42,6 @@ class ContentPane extends Component {
 export default connect(
   (state) => ({ views: state.views }),
   (dispatch) => ({
-    fetchViews: (...args) => dispatch(viewActions.fetch(...args)),
+    fetchViews: (...args) => dispatch(viewActions.fetchForExperiment(...args)),
   })
 )(ContentPane);

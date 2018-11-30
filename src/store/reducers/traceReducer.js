@@ -1,19 +1,17 @@
 import { handleActions } from 'redux-actions';
-import { freeze, push, assoc } from 'icepick';
-import findIndex from 'lodash/findIndex';
+import { freeze, assoc, assign } from 'icepick';
+import keyBy from 'lodash/keyBy';
 
-import { traceActions } from '../actions';
+import { apiActions, apiResponseHandler } from '../../helpers/api';
 
 
-const initialState = freeze([]);
+const initialState = freeze({
+  byId: {},
+});
 
 
 export default handleActions({
-  [traceActions.add](state, { payload }) {
-    const index = findIndex(state, { name: payload.trace.name });
-    if(index < 0) {
-      return push(state, payload.trace);
-    }
-    return assoc(state, index, payload.trace);
-  },
+  [apiActions.handleResponse]: apiResponseHandler('/experiments/:id/traces',
+    (state, data) => assoc(state, 'byId', assign(state.byId, keyBy(data, 'id')))
+  ),
 }, initialState);

@@ -1,29 +1,61 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import readline from 'readline';
 import yaml from 'js-yaml';
+import crypto from 'crypto';
+import csv from 'csv-streamify';
+import base32 from 'base32';
 
 
-// TODO: Do this properly
-const experimentDir = 'experiment';
-const traceNames = ['step', 'time', 'epoch', 'loss'];
-const traces = {};
-traceNames.forEach(traceName => {
+const calcHash = str => base32.encode(crypto.createHash('md5').update(str).digest().slice(0, 8));
+
+const baseDir = path.resolve('experiments');
+
+const experimentDirs = fs.readdirSync(baseDir)
+  .map(entry => path.resolve(baseDir, entry))
+  .filter(fullPath => fs.statSync(fullPath).isDirectory());
+
+const manifestsByExperiment = {};
+
+experimentDirs.forEach(experimentDir => {
+  const experimentId = path.basename(experimentDir);
+  const yamlText = fs.readFileSync(path.join(experimentDir, 'manifest.yml'));
+  manifestsByExperiment[experimentId] = yaml.safeLoad(yamlText);
+});
+
+const simpleTracesById = {};
+const traceDataById = {};
+
+const readTraceData = traceDataId => new Promise((resolve, reject) => {
   const steps = [];
   const values = [];
-  const filePath = path.join(experimentDir, 'traces', traceName, 'trace.tsv');
-  const lineReader = readline.createInterface({ input: fs.createReadStream(filePath) });
-  lineReader.on('line', line => {
-    const [step, value] = line.split('\t');
+  const parser = csv({ delimiter: '\t' });
+  parser.on('data', ([step, value]) => {
     steps.push(parseInt(step, 10));
     values.push(JSON.parse(value));
   });
-  traces[traceName] = { steps, values };
+  parser.on('end', () => resolve({ id: traceDataId, steps, values }));
+  parser.on('error', reject);
+  const { filePath } = traceDataById[traceDataId];
+  fs.createReadStream(filePath).pipe(parser);
 });
 
-const manifest = yaml.safeLoad(fs.readFileSync(path.join(experimentDir, 'manifest.yml')));
-const views = manifest.views.map((view, i) => Object.assign({}, view, { id: i + 1 }));
+Object.entries(manifestsByExperiment).forEach(([experimentId, manifest]) => {
+  manifest.traces.simple.forEach(trace => {
+    const traceDataId = calcHash(`${experimentId}/${trace.data}`);
+    traceDataById[traceDataId] = {
+      id: traceDataId,
+      filePath: path.join(baseDir, experimentId, trace.data),
+    };
+    const traceId = calcHash(`${experimentId}/${trace.name}`);
+    simpleTracesById[traceId] = {
+      id: traceId,
+      experiment: experimentId,
+      name: trace.name,
+      traceData: traceDataId,
+    };
+  });
+});
 
 const renderHtmlPage = (title, assetManifest) => (`
   <!DOCTYPE html>
@@ -40,23 +72,41 @@ const renderHtmlPage = (title, assetManifest) => (`
   </html>
 `);
 
-export default () => Promise.resolve()
-  .then(() => express())
-  .then(app => {
-    const distDir = path.resolve(__dirname, '..', 'dist');
-    app.use('/assets', express.static(distDir));
-    app.get('/', (req, res) => {
-      const title = 'Trod';
-      const assetManifest = JSON.parse(
-        fs.readFileSync(path.join(distDir, 'manifest.json'), 'utf8'));
-      const htmlContent = renderHtmlPage(title, assetManifest);
-      res.send(htmlContent);
-    });
-    app.get('/traces/:traceName', (req, res) => {
-      res.json(traces[req.params.traceName]);
-    });
-    app.get('/views', (req, res) => {
-      res.json(views);
-    });
-    return app;
+
+export default async () => {
+  const app = express();
+
+  const distDir = path.resolve(__dirname, '..', 'dist');
+  app.use('/assets', express.static(distDir));
+
+  app.get('/', (req, res) => {
+    const title = 'Trod';
+    const assetManifest = JSON.parse(
+      fs.readFileSync(path.join(distDir, 'manifest.json'), 'utf8'));
+    const htmlContent = renderHtmlPage(title, assetManifest);
+    res.send(htmlContent);
   });
+
+  app.get('/experiments/:experimentId/traces', (req, res) => {
+    const traces = Object.values(simpleTracesById)
+      .filter(trace => trace.experiment === req.params.experimentId);
+    res.json(traces);
+  });
+
+  app.get('/experiments/:experimentId/views', (req, res) => {
+    const manifest = manifestsByExperiment[req.params.experimentId];
+    const views = manifest.views.map(view => ({
+      id: calcHash(`${req.params.experimentId}/${view.name}`),
+      ...view,
+    }));
+    res.json(views);
+  });
+
+  app.get('/tracedata/:traceDataId', (req, res) => {
+    readTraceData(req.params.traceDataId).then(traceData => {
+      res.json(traceData);
+    });
+  });
+
+  return app;
+};

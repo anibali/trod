@@ -2,6 +2,7 @@ import * as Redux from 'redux';
 import ReduxThunk from 'redux-thunk';
 
 import combinedReducers from './reducers';
+import { apiMiddleware } from '../helpers/api';
 
 
 export default (initialState) => {
@@ -14,10 +15,8 @@ export default (initialState) => {
     composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || Redux.compose;
   }
 
-  const store = Redux.createStore(
+  return Redux.createStore(
     combinedReducers,
     initialState,
-    composeEnhancers(Redux.applyMiddleware(ReduxThunk)));
-
-  return store;
+    composeEnhancers(Redux.applyMiddleware(ReduxThunk, apiMiddleware)));
 };
