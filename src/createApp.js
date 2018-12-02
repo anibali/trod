@@ -87,6 +87,10 @@ export default async () => {
     res.send(htmlContent);
   });
 
+  app.get('/experiments', (req, res) => {
+    res.json(Object.keys(manifestsByExperiment).map(id => ({ id })));
+  });
+
   app.get('/experiments/:experimentId/traces', (req, res) => {
     const traces = Object.values(simpleTracesById)
       .filter(trace => trace.experiment === req.params.experimentId);

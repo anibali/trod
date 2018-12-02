@@ -5,6 +5,7 @@ import groupBy from 'lodash/groupBy';
 import zip from 'lodash/zip';
 import isEqual from 'lodash/isEqual';
 import intersection from 'lodash/intersection';
+import sortBy from 'lodash/sortBy';
 import jsonpatch from 'fast-json-patch';
 
 import PlotlyPlot from './PlotlyPlot';
@@ -12,6 +13,13 @@ import { traceDataActions } from '../store/actions';
 
 
 class TraceView extends React.Component {
+  componentDidMount() {
+    const { traces, fetchTraceData } = this.props;
+    traces.forEach(trace => {
+      fetchTraceData(trace.traceData);
+    });
+  }
+
   componentDidUpdate(prevProps) {
     const { traces, fetchTraceData } = this.props;
     // TODO: If we use a selector to cache filteredTraces, we can short-circuit the common
@@ -60,7 +68,7 @@ class TraceView extends React.Component {
       return patchedSpec;
     });
 
-    return <PlotlyPlot data={specs} />;
+    return <PlotlyPlot data={sortBy(specs, 'name')} />;
   }
 }
 

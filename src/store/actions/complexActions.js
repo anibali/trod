@@ -21,3 +21,8 @@ export const traceDataActions = {
 export const viewActions = {
   fetchForExperiment: experimentId => apiActions.fetch(`/experiments/${experimentId}/views`),
 };
+
+
+export const experimentActions = {
+  fetchAll: () => apiActions.fetch('/experiments'),
+};

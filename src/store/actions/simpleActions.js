@@ -5,20 +5,17 @@
  *   - Doesn't call other action creators
  */
 
-// import { createActions } from 'redux-actions';
-//
-//
-// const simpleActions = createActions({
-//   TROD: {
-//     TRACES: {},
-//     VIEWS: {}
-//   }
-// });
-//
-//
-// export const traceActions = simpleActions.trod.traces;
-// export const viewActions = simpleActions.trod.views;
+import { createActions } from 'redux-actions';
 
-export const traceActions = {};
-export const traceDataActions = {};
-export const viewActions = {};
+
+const simpleActions = createActions({
+  TROD: {
+    UI: {
+      SET_CURRENT_EXPERIMENT: experimentId => ({ experimentId }),
+    },
+  }
+});
+
+
+export const uiActions = simpleActions.trod.ui;
+// FIXME: Exports for all reducers

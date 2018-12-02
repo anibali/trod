@@ -5,15 +5,27 @@ import TopBar from './TopBar';
 import ContentPane from './ContentPane';
 import Sidebar from './Sidebar';
 
-import { traceActions } from '../store/actions';
+import { traceActions, experimentActions } from '../store/actions';
 import Layout from '../styles/Layout.css';
+import isEqual from 'lodash/isEqual';
 
 
 class Experiment extends React.Component {
   componentDidMount() {
-    const { experiment, comparisonExperiments, fetchTraces } = this.props;
+    const { experiment, comparisonExperiments, fetchTraces, fetchExperiments } = this.props;
+    fetchExperiments();
     fetchTraces(experiment.id);
     comparisonExperiments.forEach(exp => fetchTraces(exp.id));
+  }
+
+  componentDidUpdate(prevProps) {
+    const { experiment, comparisonExperiments, fetchTraces } = this.props;
+    if(experiment.id !== prevProps.experiment.id) {
+      fetchTraces(experiment.id);
+    }
+    if(!isEqual(comparisonExperiments, prevProps.comparisonExperiments)) {
+      comparisonExperiments.forEach(exp => fetchTraces(exp.id));
+    }
   }
 
   render() {
@@ -21,7 +33,7 @@ class Experiment extends React.Component {
 
     return (
       <div className={Layout.Wrapper}>
-        <TopBar experiment={experiment} />
+        <TopBar />
         <main className={Layout.Main}>
           <ContentPane experiment={experiment} />
           <Sidebar />
@@ -40,5 +52,6 @@ export default connect(
   },
   dispatch => ({
     fetchTraces: (...args) => dispatch(traceActions.fetchForExperiment(...args)),
+    fetchExperiments: () => dispatch(experimentActions.fetchAll()),
   })
 )(Experiment);
