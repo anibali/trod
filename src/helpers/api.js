@@ -19,7 +19,7 @@ const initialState = freeze({
 
 export const apiReducer = handleActions({
   [apiActions.setEndpointStatus](state, { payload }) {
-    return assocIn(state, [payload.path, 'status'], payload.status);
+    return assocIn(state, ['endpoints', payload.path, 'status'], payload.status);
   },
 }, initialState);
 
