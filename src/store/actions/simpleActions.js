@@ -12,10 +12,10 @@ const simpleActions = createActions({
   TROD: {
     UI: {
       SET_CURRENT_EXPERIMENT: experimentId => ({ experimentId }),
+      SET_COMPARISON_EXPERIMENTS: experimentIds => ({ experimentIds }),
     },
   }
 });
 
 
 export const uiActions = simpleActions.trod.ui;
-// FIXME: Exports for all reducers

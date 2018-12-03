@@ -101,6 +101,7 @@ export default async () => {
     const manifest = manifestsByExperiment[req.params.experimentId];
     const views = manifest.views.map(view => ({
       id: calcHash(`${req.params.experimentId}/${view.name}`),
+      experiment: req.params.experimentId,
       ...view,
     }));
     res.json(views);

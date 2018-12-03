@@ -10,6 +10,7 @@ import ContentPaneStyle from '../styles/ContentPane.css';
 
 import TraceView from './TraceView';
 import { viewActions } from '../store/actions';
+import { getCurrentExperimentViews } from '../store/selectors';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -20,12 +21,22 @@ class ContentPane extends Component {
     fetchViews(experiment.id);
   }
 
+  componentDidUpdate(prevProps) {
+    const { fetchViews, experiment } = this.props;
+    if(experiment.id !== prevProps.experiment.id) {
+      fetchViews(experiment.id);
+    }
+  }
+
   render() {
     const { views } = this.props;
-    const viewComponents = views.items.map((view, i) => (
-      <div key={view.id} className={ContentPaneStyle.Frame}
-           data-grid={{w: 3, h: 3, x: 3 * (i % 4), y: 3 * Math.floor(i / 4)}}>
-        <TraceView view={view}/>
+    const viewComponents = views.map((view, i) => (
+      <div
+        key={view.id}
+        className={ContentPaneStyle.Frame}
+        data-grid={{ w: 3, h: 3, x: 3 * (i % 4), y: 3 * Math.floor(i / 4) }}
+      >
+        <TraceView view={view} />
       </div>
     ));
     return (
@@ -40,7 +51,7 @@ class ContentPane extends Component {
 
 
 export default connect(
-  (state) => ({ views: state.views }),
+  state => ({ views: getCurrentExperimentViews(state) }),
   (dispatch) => ({
     fetchViews: (...args) => dispatch(viewActions.fetchForExperiment(...args)),
   })

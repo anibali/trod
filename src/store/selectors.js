@@ -6,6 +6,18 @@ import zip from 'lodash/zip';
 import { createSelector } from '../helpers/select';
 
 
+export const getCurrentExperimentViews = createSelector(
+  [
+    state => state.views.byId,
+    state => state.ui.currentExperiment,
+  ],
+  (views, currentExperiment) => {
+    const groupedViews = groupBy(Object.values(views), 'experiment');
+    return groupedViews[currentExperiment] || [];
+  }
+);
+
+
 export const getRequiredTraces = createSelector(
   [
     (state, props) => props.view.requiredTraces,
