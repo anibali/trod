@@ -1,8 +1,8 @@
 import { handleActions } from 'redux-actions';
-import { freeze, assoc, assign } from 'icepick';
+import { assign, assoc, freeze } from 'icepick';
+import keyBy from 'lodash/keyBy';
 
 import { apiActions, apiResponseHandler } from '../../helpers/api';
-import keyBy from 'lodash/keyBy';
 
 
 const initialState = freeze({

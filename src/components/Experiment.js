@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import isEqual from 'lodash/isEqual';
 
 import TopBar from './TopBar';
 import ContentPane from './ContentPane';
@@ -7,7 +8,6 @@ import Sidebar from './Sidebar';
 
 import { traceActions, experimentActions } from '../store/actions';
 import Layout from '../styles/Layout.css';
-import isEqual from 'lodash/isEqual';
 
 
 class Experiment extends React.Component {

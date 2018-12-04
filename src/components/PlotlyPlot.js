@@ -12,13 +12,14 @@ class PlotlyPlot extends React.PureComponent {
 
   render() {
     const { PlotlyComponent } = this;
-    const { width, height } = this.props.contentRect.bounds;
+    const { contentRect, measureRef, data } = this.props;
+    const { width, height } = contentRect.bounds;
 
     return (
-      <div ref={this.props.measureRef} style={{ height: '100%' }}>
+      <div ref={measureRef} style={{ height: '100%' }}>
         <PlotlyComponent
           onInitialized={this.onInitialized}
-          data={this.props.data}
+          data={data}
           layout={{ width, height, margin: { l: 40, r: 40, t: 50, b: 40 } }}
           fit={false}
         />

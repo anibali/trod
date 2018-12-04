@@ -6,27 +6,27 @@ import { uiActions } from '../store/actions';
 import TopBarStyle from '../styles/TopBar.css';
 
 
-class TopBar extends React.Component {
-  render() {
-    const { currentExperimentId, allExperiments, setCurrentExperiment,
-      setComparisonExperiments } = this.props;
+function TopBar(props) {
+  const {
+    currentExperimentId, allExperiments, setCurrentExperiment,
+    setComparisonExperiments
+  } = props;
 
-    const onChange = (item) => {
-      setCurrentExperiment(item);
-      setComparisonExperiments([]);
-    };
+  const onChange = (item) => {
+    setCurrentExperiment(item);
+    setComparisonExperiments([]);
+  };
 
-    return (
-      <div className={TopBarStyle.TopBar}>
-        <h1 className={TopBarStyle.brand}>Trod</h1>
-        <Combobox
-          items={allExperiments.map(exp => exp.id)}
-          selectedItem={currentExperimentId}
-          onChange={onChange}
-        />
-      </div>
-    );
-  }
+  return (
+    <div className={TopBarStyle.TopBar}>
+      <h1 className={TopBarStyle.brand}>Trod</h1>
+      <Combobox
+        items={allExperiments.map(exp => exp.id)}
+        selectedItem={currentExperimentId}
+        onChange={onChange}
+      />
+    </div>
+  );
 }
 
 
