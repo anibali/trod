@@ -18,7 +18,7 @@ class TopBar extends React.Component {
 
     return (
       <div className={TopBarStyle.TopBar}>
-        <h1>Trod</h1>
+        <h1 className={TopBarStyle.brand}>Trod</h1>
         <Combobox
           items={allExperiments.map(exp => exp.id)}
           selectedItem={currentExperimentId}

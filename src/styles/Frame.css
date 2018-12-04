@@ -1,0 +1,22 @@
+:root {
+    --frame-title-height: 24px;
+}
+
+.Outer {
+    height: 100%;
+}
+
+.TitleBar {
+    width: 100%;
+    height: var(--frame-title-height);
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.Content {
+    position: absolute;
+    top: var(--frame-title-height);
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

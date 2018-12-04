@@ -8,6 +8,7 @@ import jsonpatch from 'fast-json-patch';
 import PlotlyPlot from './PlotlyPlot';
 import { traceDataActions } from '../store/actions';
 import { getRequiredTraces, getTraceValues } from '../store/selectors';
+import FrameStyle from '../styles/Frame.css';
 
 
 class TraceView extends React.Component {
@@ -46,7 +47,13 @@ class TraceView extends React.Component {
       return patchedSpec;
     });
 
-    return <PlotlyPlot data={sortBy(specs, 'name')} />;
+    return (
+      <div className={FrameStyle.Outer}>
+        <div className={FrameStyle.TitleBar}>{view.name}</div>
+        <div className={FrameStyle.Content}>
+          <PlotlyPlot data={sortBy(specs, 'name')} />
+        </div>
+      </div>);
   }
 }
 

@@ -1,7 +1,6 @@
 @import 'evergreen-variables.css';
 
 .TopBar {
-  z-index: 1;
   height: 56px;
   display: flex;
   align-items: center;
@@ -12,4 +11,8 @@
   z-index: 9;
   background: white;
   box-shadow: var(--elevation-1);
+}
+
+.brand {
+  padding-right: 24px;
 }
