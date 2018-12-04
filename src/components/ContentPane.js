@@ -8,7 +8,7 @@ import 'react-resizable/css/styles.css';
 
 import ContentPaneStyle from '../styles/ContentPane.css';
 
-import TraceView from './TraceView';
+import Window from './Window';
 import { viewActions } from '../store/actions';
 import { getCurrentExperimentViews } from '../store/selectors';
 
@@ -33,10 +33,10 @@ class ContentPane extends Component {
     const viewComponents = views.map((view, i) => (
       <div
         key={view.id}
-        className={ContentPaneStyle.Frame}
+        className={ContentPaneStyle.GridItem}
         data-grid={{ w: 3, h: 3, x: 3 * (i % 4), y: 3 * Math.floor(i / 4) }}
       >
-        <TraceView view={view} />
+        <Window view={view} />
       </div>
     ));
     return (

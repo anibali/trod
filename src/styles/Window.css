@@ -1,0 +1,28 @@
+@import 'evergreen-variables.css';
+
+:root {
+    --frame-title-height: 24px;
+    --frame-title-border-width: 1px;
+}
+
+.Outer {
+    height: 100%;
+}
+
+.TitleBar {
+    left: 0;
+    right: 0;
+    height: var(--frame-title-height);
+    padding-left: 8px;
+    padding-right: 8px;
+    border-bottom: var(--frame-title-border-width) solid var(--color-border-default);
+}
+
+/** TODO: Use PostCSS Calc to optimise out the calc */
+.Content {
+    position: absolute;
+    top: calc(var(--frame-title-height) + var(--frame-title-border-width));
+    bottom: 0;
+    left: 0;
+    right: 0;
+}

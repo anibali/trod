@@ -7,7 +7,7 @@
   min-height: 100%;
 }
 
-.Frame {
+.GridItem {
   background-color: var(--N2);
   box-shadow: var(--elevation-1);
   border-radius: 5px;
