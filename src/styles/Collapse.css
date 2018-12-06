@@ -1,0 +1,7 @@
+.Label {
+    display: flex;
+    align-items: center;
+    padding-bottom: 8px;
+    cursor: pointer;
+    user-select: none;
+}

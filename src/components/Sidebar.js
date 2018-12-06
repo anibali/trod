@@ -1,10 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Heading, Icon, Pane, Table, Text } from 'evergreen-ui';
+import { Icon, Pane, Table } from 'evergreen-ui';
 import uniq from 'lodash/uniq';
 import without from 'lodash/without';
 import reject from 'lodash/reject';
 
+import Collapse from './Collapse';
 import SidebarStyle from '../styles/Sidebar.css';
 import { uiActions } from '../store/actions';
 
@@ -74,7 +75,7 @@ class SelectExperiments extends React.Component {
             <Table.TextHeaderCell flexBasis={40} flexGrow={0} />
             <Table.SearchHeaderCell value={filterText} onChange={this.onFilterChange} />
           </Table.Head>
-          <Table.Body height={240}>
+          <Table.Body height={128}>
             {rows}
           </Table.Body>
         </Table>
@@ -92,19 +93,16 @@ const Sidebar = (props) => {
     setComparisonExperiments(without(comparisonExperiments, item.value));
   };
   const options = comparisonOptions.map(exp => ({ label: exp.id, value: exp.id }));
-  // TODO: Make comparison experiments collapsible
   return (
     <aside className={SidebarStyle.Sidebar}>
-      <span style={{ display: 'flex', alignItems: 'center', paddingBottom: 8 }}>
-        <Icon icon="chevron-down" />
-        <Text size={400}>Comparison experiments</Text>
-      </span>
-      <SelectExperiments
-        options={options}
-        selected={comparisonExperiments}
-        onSelect={onSelect}
-        onDeselect={onDeselect}
-      />
+      <Collapse label="Comparison experiments">
+        <SelectExperiments
+          options={options}
+          selected={comparisonExperiments}
+          onSelect={onSelect}
+          onDeselect={onDeselect}
+        />
+      </Collapse>
     </aside>
   );
 };
