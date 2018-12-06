@@ -1,0 +1,41 @@
+@import '../../node_modules/rc-slider/assets/index.css';
+@import 'evergreen-variables.css';
+
+.rc-slider-track {
+    background-color: var(--B8);
+}
+
+.rc-slider-rail {
+    background-color: var(--B5);
+}
+
+.rc-slider-handle {
+    border-color: var(--B8);
+    background: var(--B8);
+}
+
+.rc-slider-handle:focus {
+    border-color: var(--B8);
+}
+
+.rc-slider-handle-click-focused:focus {
+    border-color: var(--B8);
+}
+
+.rc-slider-handle:focus {
+    border-color: var(--B8);
+    box-shadow: 0 0 3px 2px var(--B5);
+}
+
+.rc-slider-handle:hover {
+    border-color: var(--B8);
+}
+
+.rc-slider-handle:active {
+    border-color: var(--B8);
+    box-shadow: 0 0 3px 2px var(--B5);
+}
+
+.rc-slider-dot-active {
+    border-color: var(--B8);
+}

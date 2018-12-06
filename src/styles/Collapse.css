@@ -1,7 +1,7 @@
 .Label {
     display: flex;
     align-items: center;
-    padding-bottom: 8px;
+    padding: 8px 0;
     cursor: pointer;
     user-select: none;
 }

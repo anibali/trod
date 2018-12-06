@@ -11,8 +11,9 @@ import { createActions } from 'redux-actions';
 const simpleActions = createActions({
   TROD: {
     UI: {
-      SET_CURRENT_EXPERIMENT: experimentId => ({ experimentId }),
-      SET_COMPARISON_EXPERIMENTS: experimentIds => ({ experimentIds }),
+      SET_CURRENT_EXPERIMENT: experimentId => experimentId,
+      SET_COMPARISON_EXPERIMENTS: experimentIds => experimentIds,
+      SET_SMOOTHING_FACTOR: smoothingFactor => smoothingFactor,
     },
   }
 });
