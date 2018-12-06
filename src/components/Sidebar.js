@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Icon, Pane, Table } from 'evergreen-ui';
+import { Heading, Icon, Pane, Table, Text } from 'evergreen-ui';
 import uniq from 'lodash/uniq';
 import without from 'lodash/without';
 import reject from 'lodash/reject';
@@ -36,8 +36,14 @@ class SelectExperiments extends React.Component {
 
     // This indirection prevents changes to props.{onSelect,onDeselect} causing all rows
     // to rerender.
-    this.onSelect = (...args) => this.props.onSelect(...args);
-    this.onDeselect = (...args) => this.props.onDeselect(...args);
+    this.onSelect = (...args) => {
+      const { onSelect } = this.props;
+      onSelect(...args);
+    };
+    this.onDeselect = (...args) => {
+      const { onDeselect } = this.props;
+      onDeselect(...args);
+    };
 
     this.onFilterChange = (filterText) => {
       this.setState({ filterText });
@@ -86,8 +92,13 @@ const Sidebar = (props) => {
     setComparisonExperiments(without(comparisonExperiments, item.value));
   };
   const options = comparisonOptions.map(exp => ({ label: exp.id, value: exp.id }));
+  // TODO: Make comparison experiments collapsible
   return (
     <aside className={SidebarStyle.Sidebar}>
+      <span style={{ display: 'flex', alignItems: 'center', paddingBottom: 8 }}>
+        <Icon icon="chevron-down" />
+        <Text size={400}>Comparison experiments</Text>
+      </span>
       <SelectExperiments
         options={options}
         selected={comparisonExperiments}
