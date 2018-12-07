@@ -1,0 +1,17 @@
+traces:
+  derived:
+  - name: t
+    sources: [step, epoch]
+    type: multiplexed
+  simple:
+  - {data: traces/step/trace.tsv, name: step}
+  - {data: traces/epoch/trace.tsv, name: epoch}
+  - {data: traces/loss/trace.tsv, name: loss}
+  - {data: traces/generated_image/trace.tsv, name: generated_image}
+version: 1.0.0
+views:
+  - name: deliberately_broken
+    requiredTraces:
+      - step
+      - loss
+    type: not_a_real_type

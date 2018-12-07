@@ -1,0 +1,25 @@
+version: 1.0.0
+traces:
+  simple:
+  - name: step
+    data: traces/step.tsv
+  - name: loss
+    data: traces/loss.tsv
+  derived:
+  - name: t
+    type: multiplexed
+    sources: [step]
+views:
+- name: training_loss
+  requiredTraces:
+  - step
+  - loss
+  type: plotly
+  settings:
+    graphSpec:
+      type: scatter
+    injectTraces:
+    - path: /x
+      trace: step
+    - path: /y
+      trace: loss
