@@ -6,19 +6,28 @@
   "private": true,
   "description": "",
   "scripts": {
-    "build": "webpack -p",
+    "buildClient": "rm -rf dist && webpack -p",
+    "buildServer": "babel -d lib/ src/",
+    "build": "npm run buildClient && npm run buildServer",
+
     "start": "./start.sh",
-    "test": "NODE_ENV=test mocha"
+    "test": "NODE_ENV=test mocha",
+    "prepack": "npm run build"
   },
   "bin": {
-    "trod": "src/serverEntry.js"
+    "trod": "lib/serverEntry.js"
   },
+  "files": [
+    "/lib",
+    "/dist"
+  ],
   "dependencies": {
     "@babel/core": "7.1.6",
     "@babel/polyfill": "7.0.0",
     "@babel/preset-env": "7.1.6",
     "@babel/preset-react": "7.0.0",
     "@babel/register": "7.0.0",
+    "argparse": "1.0.10",
     "axios": "0.18.0",
     "base32": "0.0.6",
     "csv-streamify": "4.0.0",
@@ -45,6 +54,7 @@
     "redux-thunk": "2.3.0"
   },
   "devDependencies": {
+    "@babel/cli": "7.2.0",
     "babel-loader": "8.0.4",
     "css-loader": "1.0.1",
     "eslint": "5.9.0",

@@ -9,53 +9,56 @@ import base32 from 'base32';
 
 const calcHash = str => base32.encode(crypto.createHash('md5').update(str).digest().slice(0, 8));
 
-const baseDir = path.resolve('experiments');
+// Load all experiments from the experiment root directory.
+const loadExperiments = async (rootDir) => {
+  const experimentDirs = fs.readdirSync(rootDir)
+    .map(entry => path.resolve(rootDir, entry))
+    .filter(fullPath => fs.statSync(fullPath).isDirectory());
 
-const experimentDirs = fs.readdirSync(baseDir)
-  .map(entry => path.resolve(baseDir, entry))
-  .filter(fullPath => fs.statSync(fullPath).isDirectory());
+  const manifestsByExperiment = {};
 
-const manifestsByExperiment = {};
-
-experimentDirs.forEach(experimentDir => {
-  const experimentId = path.basename(experimentDir);
-  const yamlText = fs.readFileSync(path.join(experimentDir, 'manifest.yml'));
-  manifestsByExperiment[experimentId] = yaml.safeLoad(yamlText);
-});
-
-const simpleTracesById = {};
-const traceDataById = {};
-
-const readTraceData = traceDataId => new Promise((resolve, reject) => {
-  const steps = [];
-  const values = [];
-  const parser = csv({ delimiter: '\t' });
-  parser.on('data', ([step, value]) => {
-    steps.push(parseInt(step, 10));
-    values.push(JSON.parse(value));
+  experimentDirs.forEach(experimentDir => {
+    const experimentId = path.basename(experimentDir);
+    const yamlText = fs.readFileSync(path.join(experimentDir, 'manifest.yml'));
+    manifestsByExperiment[experimentId] = yaml.safeLoad(yamlText);
   });
-  parser.on('end', () => resolve({ id: traceDataId, steps, values }));
-  parser.on('error', reject);
-  const { filePath } = traceDataById[traceDataId];
-  fs.createReadStream(filePath).pipe(parser);
-});
 
-Object.entries(manifestsByExperiment).forEach(([experimentId, manifest]) => {
-  manifest.traces.simple.forEach(trace => {
-    const traceDataId = calcHash(`${experimentId}/${trace.data}`);
-    traceDataById[traceDataId] = {
-      id: traceDataId,
-      filePath: path.join(baseDir, experimentId, trace.data),
-    };
-    const traceId = calcHash(`${experimentId}/${trace.name}`);
-    simpleTracesById[traceId] = {
-      id: traceId,
-      experiment: experimentId,
-      name: trace.name,
-      traceData: traceDataId,
-    };
+  const simpleTracesById = {};
+  const traceDataById = {};
+
+  const readTraceData = traceDataId => new Promise((resolve, reject) => {
+    const steps = [];
+    const values = [];
+    const parser = csv({ delimiter: '\t' });
+    parser.on('data', ([step, value]) => {
+      steps.push(parseInt(step, 10));
+      values.push(JSON.parse(value));
+    });
+    parser.on('end', () => resolve({ id: traceDataId, steps, values }));
+    parser.on('error', reject);
+    const { filePath } = traceDataById[traceDataId];
+    fs.createReadStream(filePath).pipe(parser);
   });
-});
+
+  Object.entries(manifestsByExperiment).forEach(([experimentId, manifest]) => {
+    manifest.traces.simple.forEach(trace => {
+      const traceDataId = calcHash(`${experimentId}/${trace.data}`);
+      traceDataById[traceDataId] = {
+        id: traceDataId,
+        filePath: path.join(rootDir, experimentId, trace.data),
+      };
+      const traceId = calcHash(`${experimentId}/${trace.name}`);
+      simpleTracesById[traceId] = {
+        id: traceId,
+        experiment: experimentId,
+        name: trace.name,
+        traceData: traceDataId,
+      };
+    });
+  });
+
+  return { simpleTracesById, readTraceData, manifestsByExperiment };
+};
 
 const renderHtmlPage = (title, assetManifest) => (`
   <!DOCTYPE html>
@@ -73,7 +76,9 @@ const renderHtmlPage = (title, assetManifest) => (`
 `);
 
 
-export default async () => {
+export default async (rootDir) => {
+  const { simpleTracesById, readTraceData, manifestsByExperiment } = await loadExperiments(rootDir);
+
   const app = express();
 
   const distDir = path.resolve(__dirname, '..', 'dist');

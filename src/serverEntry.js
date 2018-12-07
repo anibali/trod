@@ -5,14 +5,7 @@
  */
 
 // Configure Babel to transpile imported modules.
-require('@babel/register')({
-  presets: [
-    [require.resolve('@babel/preset-env'), {
-      targets: { node: 'current' }
-    }],
-    require.resolve('@babel/preset-react')
-  ]
-});
+require('@babel/register')();
 
 
 const serverMain = require('./server').default;
