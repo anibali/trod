@@ -1,5 +1,7 @@
 import { handleActions } from 'redux-actions';
 import { freeze, assoc } from 'icepick';
+import uniq from 'lodash/uniq';
+import without from 'lodash/without';
 
 import { uiActions } from '../actions';
 
@@ -22,5 +24,11 @@ export default handleActions({
   },
   [uiActions.setSmoothingFactor](state, { payload }) {
     return assoc(state, 'smoothingFactor', payload);
-  }
+  },
+  [uiActions.addSmoothedTrace](state, { payload }) {
+    return assoc(state, 'smoothedTraces', uniq(state.smoothedTraces.concat([payload])));
+  },
+  [uiActions.removeSmoothedTrace](state, { payload }) {
+    return assoc(state, 'smoothedTraces', without(state.smoothedTraces, payload));
+  },
 }, initialState);

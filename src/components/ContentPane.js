@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-
+import sortBy from 'lodash/sortBy';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 
 import 'react-grid-layout/css/styles.css';
@@ -51,7 +51,7 @@ class ContentPane extends Component {
 
 
 export default connect(
-  state => ({ views: getCurrentExperimentViews(state) }),
+  state => ({ views: sortBy(getCurrentExperimentViews(state), 'name') }),
   (dispatch) => ({
     fetchViews: (...args) => dispatch(viewActions.fetchForExperiment(...args)),
   })

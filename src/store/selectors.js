@@ -19,6 +19,18 @@ export const getCurrentExperimentViews = createSelector(
 );
 
 
+export const getCurrentExperimentTraces = createSelector(
+  [
+    state => state.traces.byId,
+    state => state.ui.currentExperiment,
+  ],
+  (traces, currentExperiment) => {
+    const groupedTraces = groupBy(Object.values(traces), 'experiment');
+    return groupedTraces[currentExperiment] || [];
+  }
+);
+
+
 export const getRequiredTraces = createSelector(
   [
     (state, props) => props.view.requiredTraces,
