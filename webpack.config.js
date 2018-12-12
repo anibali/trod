@@ -15,7 +15,7 @@ const possibleModes = ['development', 'production'];
 const mode = process.env.NODE_ENV || 'development';
 console.assert(possibleModes.includes(mode));
 
-const nodeModulesPath = process.env.NODE_PATH || 'node_modules';
+const nodeModulesPath = path.resolve(process.env.NODE_PATH || 'node_modules');
 
 // Supported browsers (in the Browserslist config format).
 const browsers = ['last 2 versions', 'ie >= 9', 'safari >= 7'];
@@ -64,10 +64,8 @@ module.exports = {
     rules: [
       {
         test: /\.js$/,
-        exclude: /node_modules\/(?!(icepick)\/).*/,
         include: [
           path.resolve('src'),
-          path.resolve('node_modules', 'icepick'),
         ],
         use: [
           {
@@ -89,7 +87,9 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        exclude: /node_modules/,
+        include: [
+          path.resolve('src/styles'),
+        ],
         use: [
           { loader: MiniCssExtractPlugin.loader },
           {
@@ -114,7 +114,10 @@ module.exports = {
         ]
       },
       {
-        test: /node_modules\/.*\.css$/,
+        test: /\.css$/,
+        include: [
+          nodeModulesPath,
+        ],
         use: [
           { loader: MiniCssExtractPlugin.loader },
           'css-loader',

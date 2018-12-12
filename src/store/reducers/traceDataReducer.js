@@ -1,16 +1,16 @@
 import { handleActions } from 'redux-actions';
-import { freeze, assocIn } from 'icepick';
+import produce from 'immer';
 
 import { apiActions, apiResponseHandler } from '../../helpers/api';
 
 
-const initialState = freeze({
+const initialState = {
   byId: {},
-});
+};
 
 
 export default handleActions({
-  [apiActions.handleResponse]: apiResponseHandler('/tracedata/:id',
-    (state, data) => assocIn(state, ['byId', data.id], data)
-  ),
+  [apiActions.handleResponse]: apiResponseHandler('/tracedata/:id', produce((draft, data) => {
+    draft.byId[data.id] = data;
+  })),
 }, initialState);

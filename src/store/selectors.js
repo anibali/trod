@@ -1,5 +1,4 @@
 import groupBy from 'lodash/groupBy';
-import { freeze } from 'icepick';
 import intersection from 'lodash/intersection';
 import zip from 'lodash/zip';
 import { bisectRight } from 'd3-array';
@@ -50,7 +49,7 @@ export const getRequiredTraces = createSelector(
         filteredTraces = filteredTraces.concat(vs);
       }
     });
-    return freeze(filteredTraces);
+    return filteredTraces;
   }
 );
 

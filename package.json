@@ -9,7 +9,6 @@
     "buildClient": "rm -rf dist && webpack -p",
     "buildServer": "babel -d lib/ src/",
     "build": "npm run buildClient && npm run buildServer",
-
     "start": "./start.sh",
     "test": "NODE_ENV=test mocha",
     "prepack": "npm run build"
@@ -36,7 +35,7 @@
     "express": "4.16.4",
     "fast-json-patch": "2.0.7",
     "hybrid-map": "0.1.0",
-    "icepick": "2.3.1",
+    "immer": "1.8.0",
     "js-yaml": "3.12.0",
     "lodash": "4.17.11",
     "plotly.js": "1.42.5",

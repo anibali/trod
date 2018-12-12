@@ -1,17 +1,18 @@
 import { handleActions } from 'redux-actions';
-import { freeze, assoc, assign } from 'icepick';
-import keyBy from 'lodash/keyBy';
+import produce from 'immer';
 
 import { apiActions, apiResponseHandler } from '../../helpers/api';
 
 
-const initialState = freeze({
+const initialState = {
   byId: {},
-});
+};
 
 
 export default handleActions({
-  [apiActions.handleResponse]: apiResponseHandler('/experiments/:id/traces',
-    (state, data) => assoc(state, 'byId', assign(state.byId, keyBy(data, 'id')))
-  ),
+  [apiActions.handleResponse]: apiResponseHandler('/experiments/:id/traces', produce((draft, data) => {
+    data.forEach(exp => {
+      draft.byId[exp.id] = exp;
+    });
+  })),
 }, initialState);

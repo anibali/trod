@@ -2,7 +2,7 @@ import React from 'react';
 import { withContentRect } from 'react-measure';
 import createPlotlyComponent from 'react-plotly.js/factory';
 import jsonpatch from 'fast-json-patch';
-import { thaw } from 'icepick';
+import cloneDeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
 
 import Plotly from '../../helpers/plotlyCustom';
@@ -26,7 +26,7 @@ class PlotlyView extends React.PureComponent {
         path,
         value: vs[trace],
       }));
-      const patchedSpec = jsonpatch.applyPatch(thaw(view.settings.graphSpec), patch).newDocument;
+      const patchedSpec = jsonpatch.applyPatch(cloneDeep(view.settings.graphSpec), patch).newDocument;
       if(patchedSpec.name == null) {
         patchedSpec.name = expId;
       } else {

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { createActions, handleActions } from 'redux-actions';
-import { assocIn, freeze } from 'icepick';
+import produce from 'immer';
+import merge from 'lodash/merge';
 import { matchPath } from 'react-router';
 
 
@@ -13,14 +14,14 @@ export const apiActions = createActions({
 }).api;
 
 
-const initialState = freeze({
+const initialState = {
   endpoints: {},
-});
+};
 
 export const apiReducer = handleActions({
-  [apiActions.setEndpointStatus](state, { payload }) {
-    return assocIn(state, ['endpoints', payload.path, 'status'], payload.status);
-  },
+  [apiActions.setEndpointStatus]: produce((draft, { payload }) => {
+    merge(draft.endpoints, { [payload.path]: { status: payload.status } });
+  }),
 }, initialState);
 
 
