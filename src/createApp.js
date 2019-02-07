@@ -10,6 +10,11 @@ import chokidar from 'chokidar';
 
 const calcHash = str => base32.encode(crypto.createHash('md5').update(str).digest().slice(0, 8));
 
+const isSubpath = (parent, filePath) => {
+  const relative = path.relative(parent, filePath);
+  return !relative.startsWith('..') && !path.isAbsolute(relative);
+};
+
 const watchExperiments = (rootDir) => {
   const experimentsState = {
     simpleTracesById: {},
@@ -52,9 +57,8 @@ const watchExperiments = (rootDir) => {
 
     allExperiments.forEach(expId => {
       let manifest;
-      const expChanged = changedExperiments.includes(expId)
-        || !(expId in experimentsState.manifestsByExperiment);
-      if(expChanged) {
+      if(changedExperiments.includes(expId)
+          || !(expId in experimentsState.manifestsByExperiment)) {
         // Load experiment manifest
         const experimentDir = path.join(rootDir, expId);
         const yamlText = fs.readFileSync(path.join(experimentDir, 'manifest.yml'));
@@ -65,16 +69,21 @@ const watchExperiments = (rootDir) => {
       }
       manifestsByExperiment[expId] = manifest;
 
-      // TODO: Prevent reloading traces unless they actually change
       manifest.traces.simple.forEach(trace => {
         const traceDataId = calcHash(`${expId}/${trace.data}`);
-        const traceId = calcHash(`${expId}/${trace.name}`);
-        if(expChanged) {
+        if(events.some(e => isSubpath(path.join(rootDir, expId, trace.data), e.fsPath))
+            || !(traceDataId in experimentsState.traceDataById)) {
           traceDataById[traceDataId] = {
             id: traceDataId,
             filePath: path.join(rootDir, expId, trace.data),
           };
+        } else {
+          traceDataById[traceDataId] = experimentsState.traceDataById[traceDataId];
+        }
 
+        const traceId = calcHash(`${expId}/${trace.name}`);
+        if(events.some(e => isSubpath(path.join(rootDir, expId, trace.name), e.fsPath))
+            || !(traceId in experimentsState.simpleTracesById)) {
           simpleTracesById[traceId] = {
             id: traceId,
             experiment: expId,
@@ -82,7 +91,6 @@ const watchExperiments = (rootDir) => {
             traceData: traceDataId,
           };
         } else {
-          traceDataById[traceDataId] = experimentsState.traceDataById[traceDataId];
           simpleTracesById[traceId] = experimentsState.simpleTracesById[traceId];
         }
       });
