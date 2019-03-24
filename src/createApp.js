@@ -15,6 +15,10 @@ const isSubpath = (parent, filePath) => {
   return !relative.startsWith('..') && !path.isAbsolute(relative);
 };
 
+const isDirectory = (filePath) => {
+  return fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory();
+}
+
 const watchExperiments = (rootDir) => {
   const experimentsState = {
     simpleTracesById: {},
@@ -44,11 +48,11 @@ const watchExperiments = (rootDir) => {
     );
     changedExpSet.delete('');
     const changedExperiments = [...changedExpSet]
-      .filter(expId => fs.statSync(path.join(rootDir, expId)).isDirectory());
+      .filter(expId => isDirectory(path.join(rootDir, expId)));
 
     const allExperiments = fs.readdirSync(rootDir)
       .map(entry => path.resolve(rootDir, entry))
-      .filter(fullPath => fs.statSync(fullPath).isDirectory())
+      .filter(fullPath => isDirectory(fullPath))
       .map(fullPath => path.basename(fullPath));
 
     const simpleTracesById = {};
@@ -56,44 +60,48 @@ const watchExperiments = (rootDir) => {
     const manifestsByExperiment = {};
 
     allExperiments.forEach(expId => {
-      let manifest;
-      if(changedExperiments.includes(expId)
-          || !(expId in experimentsState.manifestsByExperiment)) {
-        // Load experiment manifest
-        const experimentDir = path.join(rootDir, expId);
-        const yamlText = fs.readFileSync(path.join(experimentDir, 'manifest.yml'));
-        manifest = yaml.safeLoad(yamlText);
-      } else {
-        // Copy previously loaded experiment manifest
-        manifest = experimentsState.manifestsByExperiment[expId];
+      try {
+        let manifest;
+        if(changedExperiments.includes(expId)
+            || !(expId in experimentsState.manifestsByExperiment)) {
+          // Load experiment manifest
+          const experimentDir = path.join(rootDir, expId);
+          const yamlText = fs.readFileSync(path.join(experimentDir, 'manifest.yml'));
+          manifest = yaml.safeLoad(yamlText);
+        } else {
+          // Copy previously loaded experiment manifest
+          manifest = experimentsState.manifestsByExperiment[expId];
+        }
+        manifestsByExperiment[expId] = manifest;
+
+        manifest.traces.simple.forEach(trace => {
+          const traceDataId = calcHash(`${expId}/${trace.data}`);
+          if(events.some(e => isSubpath(path.join(rootDir, expId, trace.data), e.fsPath))
+              || !(traceDataId in experimentsState.traceDataById)) {
+            traceDataById[traceDataId] = {
+              id: traceDataId,
+              filePath: path.join(rootDir, expId, trace.data),
+            };
+          } else {
+            traceDataById[traceDataId] = experimentsState.traceDataById[traceDataId];
+          }
+
+          const traceId = calcHash(`${expId}/${trace.name}`);
+          if(events.some(e => isSubpath(path.join(rootDir, expId, trace.name), e.fsPath))
+              || !(traceId in experimentsState.simpleTracesById)) {
+            simpleTracesById[traceId] = {
+              id: traceId,
+              experiment: expId,
+              name: trace.name,
+              traceData: traceDataId,
+            };
+          } else {
+            simpleTracesById[traceId] = experimentsState.simpleTracesById[traceId];
+          }
+        });
+      } catch(ex) {
+        console.warn(`Failed to load experiment: ${expId}`);
       }
-      manifestsByExperiment[expId] = manifest;
-
-      manifest.traces.simple.forEach(trace => {
-        const traceDataId = calcHash(`${expId}/${trace.data}`);
-        if(events.some(e => isSubpath(path.join(rootDir, expId, trace.data), e.fsPath))
-            || !(traceDataId in experimentsState.traceDataById)) {
-          traceDataById[traceDataId] = {
-            id: traceDataId,
-            filePath: path.join(rootDir, expId, trace.data),
-          };
-        } else {
-          traceDataById[traceDataId] = experimentsState.traceDataById[traceDataId];
-        }
-
-        const traceId = calcHash(`${expId}/${trace.name}`);
-        if(events.some(e => isSubpath(path.join(rootDir, expId, trace.name), e.fsPath))
-            || !(traceId in experimentsState.simpleTracesById)) {
-          simpleTracesById[traceId] = {
-            id: traceId,
-            experiment: expId,
-            name: trace.name,
-            traceData: traceDataId,
-          };
-        } else {
-          simpleTracesById[traceId] = experimentsState.simpleTracesById[traceId];
-        }
-      });
     });
 
     experimentsState.manifestsByExperiment = manifestsByExperiment;

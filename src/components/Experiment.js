@@ -22,11 +22,13 @@ class Experiment extends React.Component {
 
   componentDidUpdate(prevProps) {
     const { experiment, comparisonExperiments, fetchTraces } = this.props;
-    if(experiment && prevProps.experiment && experiment.id !== prevProps.experiment.id) {
-      fetchTraces(experiment.id);
-    }
-    if(!isEqual(comparisonExperiments, prevProps.comparisonExperiments)) {
-      comparisonExperiments.forEach(exp => fetchTraces(exp.id));
+    if(experiment) {
+      if(!prevProps.experiment || experiment.id !== prevProps.experiment.id) {
+        fetchTraces(experiment.id);
+      }
+      if(!isEqual(comparisonExperiments, prevProps.comparisonExperiments)) {
+        comparisonExperiments.forEach(exp => fetchTraces(exp.id));
+      }
     }
   }
 
