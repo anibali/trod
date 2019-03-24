@@ -17,11 +17,14 @@ function TopBar(props) {
     setComparisonExperiments([]);
   };
 
+  const items = allExperiments.map(exp => exp.id);
+  items.sort();
+
   return (
     <div className={TopBarStyle.TopBar}>
       <h1 className={TopBarStyle.brand}>Trod</h1>
       <Combobox
-        items={allExperiments.map(exp => exp.id)}
+        items={items}
         selectedItem={currentExperimentId}
         onChange={onChange}
       />
