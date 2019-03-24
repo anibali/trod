@@ -14,13 +14,15 @@ class Experiment extends React.Component {
   componentDidMount() {
     const { experiment, comparisonExperiments, fetchTraces, fetchExperiments } = this.props;
     fetchExperiments();
-    fetchTraces(experiment.id);
-    comparisonExperiments.forEach(exp => fetchTraces(exp.id));
+    if(experiment) {
+      fetchTraces(experiment.id);
+      comparisonExperiments.forEach(exp => fetchTraces(exp.id));
+    }
   }
 
   componentDidUpdate(prevProps) {
     const { experiment, comparisonExperiments, fetchTraces } = this.props;
-    if(experiment.id !== prevProps.experiment.id) {
+    if(experiment && prevProps.experiment && experiment.id !== prevProps.experiment.id) {
       fetchTraces(experiment.id);
     }
     if(!isEqual(comparisonExperiments, prevProps.comparisonExperiments)) {
@@ -31,13 +33,18 @@ class Experiment extends React.Component {
   render() {
     const { experiment } = this.props;
 
+    let inner = null;
+    if(experiment) {
+      inner = (<>
+        <ContentPane experiment={experiment} />
+        <Sidebar />
+      </>);
+    }
+
     return (
       <div className={Layout.Wrapper}>
         <TopBar />
-        <main className={Layout.Main}>
-          <ContentPane experiment={experiment} />
-          <Sidebar />
-        </main>
+        <main className={Layout.Main}>{inner}</main>
       </div>
     );
   }
@@ -46,7 +53,9 @@ class Experiment extends React.Component {
 
 export default connect(
   state => {
-    const experiment = { id: state.ui.currentExperiment };
+    const experiment = state.ui.currentExperiment
+      ? { id: state.ui.currentExperiment }
+      : null;
     const comparisonExperiments = state.ui.comparisonExperiments.map(id => ({ id }));
     return { experiment, comparisonExperiments };
   },

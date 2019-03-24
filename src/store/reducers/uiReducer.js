@@ -6,7 +6,7 @@ import { uiActions } from '../actions';
 
 
 const initialState = {
-  currentExperiment: 'exp1',
+  currentExperiment: null,
   comparisonExperiments: [],
   smoothedTraces: [],
   smoothingFactor: 10,
