@@ -36,13 +36,19 @@ class PlotlyView extends React.PureComponent {
     });
 
     const data = sortBy(specs, 'name');
+    const layout = {
+      width,
+      height,
+      margin: { l: 40, r: 40, t: 50, b: 40 },
+      ...view.settings.layout,
+    };
 
     return (
       <div ref={measureRef} style={{ height: '100%' }}>
         <PlotlyComponent
           onInitialized={this.onInitialized}
           data={data}
-          layout={{ width, height, margin: { l: 40, r: 40, t: 50, b: 40 } }}
+          layout={layout}
           fit={false}
         />
       </div>
