@@ -13,6 +13,7 @@
     left: 0;
     right: 0;
     height: var(--frame-title-height);
+    line-height: var(--frame-title-height);
     padding-left: 8px;
     padding-right: 8px;
     border-bottom: var(--frame-title-border-width) solid var(--color-border-default);
