@@ -7,6 +7,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 import ContentPaneStyle from '../styles/ContentPane.css';
+import WindowStyle from '../styles/Window.css';
 
 import Window from './Window';
 import { viewActions } from '../store/actions';
@@ -41,7 +42,9 @@ class ContentPane extends Component {
     ));
     return (
       <section className={ContentPaneStyle.ContentPane}>
-        <ResponsiveGridLayout style={{ width: '100%' }} rowHeight={100} width={1200}>
+        <ResponsiveGridLayout style={{ width: '100%' }} rowHeight={100}
+          width={1200} draggableHandle={`.${WindowStyle.TitleBar}`}
+        >
           {viewComponents}
         </ResponsiveGridLayout>
       </section>
