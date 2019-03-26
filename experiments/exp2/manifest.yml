@@ -5,6 +5,8 @@ traces:
     data: traces/step.tsv
   - name: loss
     data: traces/loss.tsv
+  - name: pose
+    data: traces/pose.tsv
   derived:
   - name: t
     type: multiplexed

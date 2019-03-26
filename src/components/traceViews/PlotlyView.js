@@ -4,35 +4,121 @@ import createPlotlyComponent from 'react-plotly.js/factory';
 import jsonpatch from 'fast-json-patch';
 import cloneDeep from 'lodash/cloneDeep';
 import sortBy from 'lodash/sortBy';
+import RcSlider, { createSliderWithTooltip } from 'rc-slider';
 
 import Plotly from '../../helpers/plotlyCustom';
 
+import WindowStyle from '../../styles/Window.css';
+import '../../styles/rc-slider.global.css';
+
+
+const Slider = createSliderWithTooltip(RcSlider);
 
 class PlotlyView extends React.PureComponent {
   constructor(props) {
     super(props);
     this.PlotlyComponent = createPlotlyComponent(Plotly);
+
+    this.state = { timeInstant: null };
+
+    this.onTimeInstantChange = (timeInstant) => {
+      this.setState({ timeInstant });
+    };
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const { view, traceValues } = props;
+    const newState = {};
+    if(view.settings.snapshotTimescale && state.timeInstant == null) {
+      let timeTrace = null;
+      Object.values(traceValues).forEach(traces => {
+        if(traces[view.settings.snapshotTimescale]) {
+          timeTrace = traces[view.settings.snapshotTimescale];
+        }
+      });
+      if(timeTrace) {
+        newState.timeInstant = timeTrace[timeTrace.length - 1];
+      }
+    }
+    return newState;
   }
 
   render() {
     const { PlotlyComponent } = this;
     const { contentRect, measureRef, view, traceValues } = this.props;
-    const { width, height } = contentRect.bounds;
+    let { width, height } = contentRect.bounds;
+    const { timeInstant } = this.state;
 
-    const specs = Object.entries(traceValues).map(([expId, vs]) => {
-      // Substitute trace values into the Plotly spec.
-      const patch = view.settings.injectTraces.map(({ path, trace }) => ({
-        op: 'add',
-        path,
-        value: vs[trace],
-      }));
-      const patchedSpec = jsonpatch.applyPatch(cloneDeep(view.settings.graphSpec), patch).newDocument;
-      if(patchedSpec.name == null) {
-        patchedSpec.name = expId;
-      } else {
-        patchedSpec.name = `${expId}/${patchedSpec.name}`;
+    let slider = null;
+    const timescaleInvMap = {};
+    if(view.settings.snapshotTimescale) {
+      let timeTrace = null;
+      Object.values(traceValues).forEach(traces => {
+        if(traces[view.settings.snapshotTimescale]) {
+          timeTrace = traces[view.settings.snapshotTimescale];
+        }
+      });
+      if(timeTrace) {
+        const marks = {};
+        const max = timeTrace[timeTrace.length - 1];
+        timeTrace.forEach((value, i) => {
+          marks[value] = '';
+          timescaleInvMap[value] = i;
+        });
+        slider = (
+          <div className={WindowStyle.TimelineSlider}>
+            <Slider
+              value={timeInstant}
+              marks={marks}
+              max={max}
+              step={null}
+              onChange={this.onTimeInstantChange}
+            />
+          </div>
+        );
+        height -= 36;
       }
-      return patchedSpec;
+    }
+
+    const specTemplates = [];
+    if(view.settings.data) {
+      Array.prototype.push.apply(specTemplates, view.settings.data);
+    } else {
+      // TODO: Remove support for this way of specifying graphSpec and injectTraces.
+      specTemplates.push({
+        graphSpec: view.settings.graphSpec,
+        injectTraces: view.settings.injectTraces,
+      });
+    }
+
+    const specs = [];
+    specTemplates.forEach((specTemplate) => {
+      Object.entries(traceValues).forEach(([expId, vs]) => {
+        // Substitute trace values into the Plotly spec.
+        const patch = specTemplate.injectTraces.map(({ path, trace, field, snapshot }) => {
+          let value = vs[trace];
+          if(snapshot) {
+            let index = timescaleInvMap[timeInstant];
+            if(index == null) {
+              index = value.length - 1;
+            }
+            value = value[index];
+          }
+          if(field) {
+            value = value.map(v => v[field]);
+          }
+          return { op: 'add', path, value };
+        });
+        const patchedSpec = jsonpatch.applyPatch(
+          cloneDeep(specTemplate.graphSpec), patch
+        ).newDocument;
+        if(patchedSpec.name == null) {
+          patchedSpec.name = expId;
+        } else {
+          patchedSpec.name = `${expId}/${patchedSpec.name}`;
+        }
+        specs.push(patchedSpec);
+      });
     });
 
     const data = sortBy(specs, 'name');
@@ -44,14 +130,17 @@ class PlotlyView extends React.PureComponent {
     };
 
     return (
-      <div ref={measureRef} style={{ height: '100%' }}>
-        <PlotlyComponent
-          onInitialized={this.onInitialized}
-          data={data}
-          layout={layout}
-          fit={false}
-        />
-      </div>
+      <>
+        <div ref={measureRef} className={WindowStyle.FullHeight}>
+          <PlotlyComponent
+            onInitialized={this.onInitialized}
+            data={data}
+            layout={layout}
+            fit={false}
+          />
+          {slider}
+        </div>
+      </>
     );
   }
 }

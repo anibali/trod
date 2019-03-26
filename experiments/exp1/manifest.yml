@@ -7,6 +7,8 @@ traces:
     data: traces/epoch.tsv
   - name: loss
     data: traces/loss.tsv
+  - name: pose
+    data: traces/pose.tsv
   derived:
   - name: t
     type: multiplexed
@@ -38,3 +40,24 @@ views:
         trace: epoch
       - path: /y
         trace: loss
+- name: pose
+  requiredTraces:
+  - step
+  - pose
+  settings:
+    data:
+      - graphSpec:
+          type: scatter
+        injectTraces:
+        - path: /x
+          trace: pose
+          field: 'x'
+          snapshot: true
+        - path: /y
+          trace: pose
+          field: 'y'
+          snapshot: true
+    layout:
+      hovermode: closest
+    snapshotTimescale: step
+  type: plotly

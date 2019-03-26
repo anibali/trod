@@ -5,7 +5,7 @@
     --frame-title-border-width: 1px;
 }
 
-.Outer {
+.FullHeight {
     height: 100%;
 }
 
@@ -26,4 +26,9 @@
     bottom: 0;
     left: 0;
     right: 0;
+    background: white;
+}
+
+.TimelineSlider {
+    padding: 0px 24px;
 }

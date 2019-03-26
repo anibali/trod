@@ -43,7 +43,7 @@ class Window extends React.Component {
     }
 
     return (
-      <div className={WindowStyle.Outer}>
+      <div className={WindowStyle.FullHeight}>
         <div className={WindowStyle.TitleBar}>{view.name}</div>
         <div className={WindowStyle.Content}>
           {viewComponent}
