@@ -86,6 +86,12 @@ module.exports = {
         ]
       },
       {
+        // Required for Plotly to work correctly.
+        test: /\.js$/,
+        loader: 'ify-loader',
+        exclude: [path.resolve('src')],
+      },
+      {
         test: /\.css$/,
         include: [
           path.resolve('src/styles'),
