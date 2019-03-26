@@ -27,7 +27,9 @@ const watchExperiments = (rootDir) => {
     readTraceData: function(traceDataId) {
       const steps = [];
       const values = [];
-      const parser = csv({ delimiter: '\t' });
+      // We disable quotations by using a value for "quote" which we're unlikely
+      // to ever encounter
+      const parser = csv({ delimiter: '\t', quote: '\n\0\n\t\n' });
       parser.on('data', ([step, value]) => {
         steps.push(parseInt(step, 10));
         values.push(JSON.parse(value));
