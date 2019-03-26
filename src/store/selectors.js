@@ -122,7 +122,7 @@ export const getTraceValues = createSelector(
 
     const valuesForTrace = (trace) => {
       const { steps, values } = traceData[trace.traceData];
-      if(smoothedTraces.includes(trace.name)) {
+      if(smoothedTraces.includes(trace.name) && !values.some(Number.isNaN)) {
         return weightedMovingAverage(steps, values, smoothingFactor);
       }
       return values;
