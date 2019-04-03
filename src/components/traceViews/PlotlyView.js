@@ -95,8 +95,11 @@ class PlotlyView extends React.PureComponent {
     specTemplates.forEach((specTemplate) => {
       Object.entries(traceValues).forEach(([expId, vs]) => {
         // Substitute trace values into the Plotly spec.
-        const patch = specTemplate.injectTraces.map(({ path, trace, field, snapshot, gather }) => {
+        const patch = specTemplate.injectTraces.flatMap(({ path, trace, field, snapshot, gather }) => {
           let value = vs[trace];
+          if(value == null) {
+            return [];
+          }
           if(snapshot) {
             let index = timescaleInvMap[timeInstant];
             if(index == null) {
@@ -104,13 +107,16 @@ class PlotlyView extends React.PureComponent {
             }
             value = value[index];
           }
+          if(value == null) {
+            return [];
+          }
           if(field) {
             value = value.map(v => v[field]);
           }
           if(gather != null) {
             value = gather.map(index => value[index]);
           }
-          return { op: 'add', path, value };
+          return [{ op: 'add', path, value }];
         });
         const patchedSpec = jsonpatch.applyPatch(
           cloneDeep(specTemplate.graphSpec), patch
