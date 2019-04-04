@@ -2467,13 +2467,6 @@ cssesc@^2.0.0:
   resolved "https://registry.yarnpkg.com/cssesc/-/cssesc-2.0.0.tgz#3b13bd1bb1cb36e1bcb5a4dcd27f54c5dcb35703"
   integrity sha512-MsCAG1z9lPdoO/IUMLSBWBSVxVtJ1395VGIQ+Fc2gNdkQ1hNDnQdw3YhA71WJCBW1vdwA0cAnk/DnW6bqoEUYg==
 
-csv-streamify@4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/csv-streamify/-/csv-streamify-4.0.0.tgz#8d01cc2f814a4a3cbe04064a5f117d9777e6f5bb"
-  integrity sha512-d+QZf8WaKwn/8/dJDyN0TFkmSH0fHBFJSyz+ujC2a5sGvXgxEj3zBwqx/mLoPMJ+YbI9H7n3h5YL4uAHUj731w==
-  dependencies:
-    through2 "2.0.3"
-
 cubic-hermite@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/cubic-hermite/-/cubic-hermite-1.0.0.tgz#84e3b2f272b31454e8393b99bb6aed45168c14e5"
@@ -9044,14 +9037,6 @@ text-table@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/text-table/-/text-table-0.2.0.tgz#7f5ee823ae805207c00af2df4a84ec3fcfa570b4"
   integrity sha1-f17oI66AUgfACvLfSoTsP8+lcLQ=
-
-through2@2.0.3:
-  version "2.0.3"
-  resolved "https://registry.yarnpkg.com/through2/-/through2-2.0.3.tgz#0004569b37c7c74ba39c43f3ced78d1ad94140be"
-  integrity sha1-AARWmzfHx0ujnEPzzteNGtlBQL4=
-  dependencies:
-    readable-stream "^2.1.5"
-    xtend "~4.0.1"
 
 through2@^0.6.3:
   version "0.6.5"

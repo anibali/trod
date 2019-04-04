@@ -3,9 +3,9 @@ import path from 'path';
 import fs from 'fs';
 import yaml from 'js-yaml';
 import crypto from 'crypto';
-import csv from 'csv-streamify';
 import base32 from 'base32';
 import chokidar from 'chokidar';
+import { Transform } from 'stream';
 
 
 const calcHash = str => base32.encode(crypto.createHash('md5').update(str).digest().slice(0, 8));
@@ -15,8 +15,50 @@ const isSubpath = (parent, filePath) => {
   return !relative.startsWith('..') && !path.isAbsolute(relative);
 };
 
-const isDirectory = (filePath) => {
-  return fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory();
+const isDirectory = filePath => fs.existsSync(filePath) && fs.lstatSync(filePath).isDirectory();
+
+class TraceDataParser extends Transform {
+  constructor() {
+    super({ objectMode: true });
+    this.buffer = Buffer.alloc(4 * 1024 * 1024);
+    this.buffer2 = Buffer.alloc(4 * 1024 * 1024);
+    this.bufLen = 0;
+    this.key = null;
+  }
+
+  _transform(chunk, encoding, callback) {
+    const newChunk = this.buffer2.slice(0, this.bufLen + chunk.length);
+    this.buffer.copy(newChunk, 0, 0, this.bufLen);
+    chunk.copy(newChunk, this.bufLen);
+    chunk = newChunk;
+    let chunkPos = 0;
+    while(true) {
+      if(this.key == null) {
+        // Parse key (step).
+        const tabIndex = chunk.indexOf('\t', chunkPos);
+        if(tabIndex < 0) {
+          break;
+        }
+        this.key = parseInt(chunk.slice(chunkPos, tabIndex).toString(encoding), 10);
+        chunkPos = tabIndex + 1;
+      } else {
+        // Parse value.
+        const nlIndex = chunk.indexOf('\n', chunkPos);
+        if(nlIndex < 0) {
+          break;
+        }
+        const value = JSON.parse(chunk.slice(chunkPos, nlIndex).toString(encoding));
+        chunkPos = nlIndex + 1;
+        this.push([this.key, value]);
+        this.key = null;
+      }
+    }
+    // Store left-over data for next time.
+    chunk.copy(this.buffer, 0, chunkPos);
+    this.bufLen = chunk.length - chunkPos;
+    // Signal that we have finished with this chunk.
+    callback();
+  }
 }
 
 const watchExperiments = (rootDir) => {
@@ -27,19 +69,14 @@ const watchExperiments = (rootDir) => {
     readTraceData: function(traceDataId) {
       const steps = [];
       const values = [];
-      // We disable quotations by using a value for "quote" which we're unlikely
-      // to ever encounter
-      const parser = csv({ delimiter: '\t', quote: '\n\0\n\t\n' });
-      parser.on('data', ([step, value]) => {
-        steps.push(parseInt(step, 10));
-        values.push(JSON.parse(value));
-      });
+      const trans = new TraceDataParser();
       const promise = new Promise((resolve, reject) => {
-        parser.on('end', () => resolve({ id: traceDataId, steps, values }));
-        parser.on('error', reject);
+        trans.on('data', ([step, value]) => { steps.push(step); values.push(value); });
+        trans.on('end', () => resolve({ id: traceDataId, steps, values }));
+        trans.on('error', reject);
       });
       const { filePath } = experimentsState.traceDataById[traceDataId];
-      fs.createReadStream(filePath).pipe(parser);
+      fs.createReadStream(filePath).pipe(trans);
       return promise;
     },
   };
