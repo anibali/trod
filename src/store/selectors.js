@@ -1,6 +1,6 @@
 import groupBy from 'lodash/groupBy';
-import intersection from 'lodash/intersection';
-import zip from 'lodash/zip';
+import sortedIndexOf from 'lodash/sortedIndexOf';
+import sortBy from 'lodash/sortBy';
 import { bisectRight } from 'd3-array';
 
 import { createSelector } from '../helpers/select';
@@ -115,31 +115,58 @@ export const getTraceValues = createSelector(
     state => state.ui.smoothingFactor,
   ],
   (traces, traceData, smoothedTraces, smoothingFactor) => {
-    const allDataAvailable = traces.every(trace => traceData[trace.traceData] != null);
-    if(!allDataAvailable) {
+    // Return early if any of the data is not yet available.
+    if(!traces.every(trace => traceData[trace.traceData] != null)) {
       return {};
     }
 
-    const valuesForTrace = (trace) => {
+    // Prepare the nested structure of traceValues.
+    const traceValues = {};
+    traces.forEach(trace => {
+      if(traceValues[trace.experiment] == null) {
+        traceValues[trace.experiment] = {};
+      }
+      traceValues[trace.experiment][trace.name] = [];
+    });
+
+    // Ordering traces by number of data points makes finding common steps faster.
+    traces = sortBy(traces, trace => traceData[trace.traceData].steps.length);
+
+    const stepses = traces.map(trace => traceData[trace.traceData].steps);
+    const valueses = traces.map(trace => {
       const { steps, values } = traceData[trace.traceData];
       if(smoothedTraces.includes(trace.name) && !values.some(Number.isNaN)) {
         return weightedMovingAverage(steps, values, smoothingFactor);
       }
       return values;
-    };
-
-    // Find the steps shared by all traces.
-    const commonSteps = intersection(...traces.map(trace => traceData[trace.traceData].steps));
-    // Get the trace values for all common steps.
-    const traceValues = {};
-    traces.forEach(trace => {
-      const valuesByStep = new Map(
-        zip(traceData[trace.traceData].steps, valuesForTrace(trace)));
-      if(traceValues[trace.experiment] === undefined) {
-        traceValues[trace.experiment] = {};
-      }
-      traceValues[trace.experiment][trace.name] = commonSteps.map(step => valuesByStep.get(step));
     });
+
+    if(stepses.length > 0) {
+      for(let i = 0; i < stepses[0].length; ++i) {
+        const step = stepses[0][i];
+        const indices = [i];
+        for(let j = 1; j < stepses.length; ++j) {
+          // NOTE: Given a better binary search function, we could limit the
+          //       starting bound of the search range as we proceed. However,
+          //       this isn't really a performance bottleneck right now.
+          const index = sortedIndexOf(stepses[j], step);
+          if(index < 0) {
+            break;
+          } else {
+            indices.push(index);
+          }
+        }
+        // If each trace contains data points at this step, take those points.
+        if(indices.length === valueses.length) {
+          for(let j = 0; j < valueses.length; ++j) {
+            const index = indices[j];
+            const trace = traces[j];
+            traceValues[trace.experiment][trace.name].push(valueses[j][index]);
+          }
+        }
+      }
+    }
+
     return traceValues;
   }
 );
