@@ -135,7 +135,7 @@ export const getTraceValues = createSelector(
     const stepses = traces.map(trace => traceData[trace.traceData].steps);
     const valueses = traces.map(trace => {
       const { steps, values } = traceData[trace.traceData];
-      if(smoothedTraces.includes(trace.name) && !values.some(Number.isFinite)) {
+      if(smoothedTraces.includes(trace.name) && values.every(Number.isFinite)) {
         return weightedMovingAverage(steps, values, smoothingFactor);
       }
       return values;
