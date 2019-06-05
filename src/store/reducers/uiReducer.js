@@ -6,7 +6,6 @@ import { uiActions } from '../actions';
 
 
 const initialState = {
-  currentExperiment: null,
   comparisonExperiments: [],
   smoothedTraces: [],
   smoothingFactor: 10,
@@ -14,9 +13,6 @@ const initialState = {
 
 
 export default handleActions({
-  [uiActions.setCurrentExperiment]: produce((draft, { payload }) => {
-    draft.currentExperiment = payload;
-  }),
   [uiActions.setComparisonExperiments]: produce((draft, { payload }) => {
     draft.comparisonExperiments = payload;
   }),

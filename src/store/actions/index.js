@@ -6,4 +6,4 @@ export const traceActions = { ...complex.traceActions };
 export const traceDataActions = { ...complex.traceDataActions };
 export const viewActions = { ...complex.viewActions };
 export const experimentActions = { ...complex.experimentActions };
-export const uiActions = { ...simple.uiActions };
+export const uiActions = { ...simple.uiActions, ...complex.uiActions };

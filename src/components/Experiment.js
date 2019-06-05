@@ -12,40 +12,40 @@ import Layout from '../styles/Layout.css';
 
 class Experiment extends React.Component {
   componentDidMount() {
-    const { experiment, comparisonExperiments, fetchTraces, fetchExperiments } = this.props;
+    const { experimentId, comparisonExperiments, fetchTraces, fetchExperiments } = this.props;
     fetchExperiments();
-    if(experiment) {
-      fetchTraces(experiment.id);
-      comparisonExperiments.forEach(exp => fetchTraces(exp.id));
+    if(experimentId != null) {
+      fetchTraces(experimentId);
+      comparisonExperiments.forEach(expId => fetchTraces(expId));
     }
   }
 
   componentDidUpdate(prevProps) {
-    const { experiment, comparisonExperiments, fetchTraces } = this.props;
-    if(experiment) {
-      if(!prevProps.experiment || experiment.id !== prevProps.experiment.id) {
-        fetchTraces(experiment.id);
+    const { experimentId, comparisonExperiments, fetchTraces } = this.props;
+    if(experimentId != null) {
+      if(!prevProps.experimentId || experimentId !== prevProps.experimentId) {
+        fetchTraces(experimentId);
       }
       if(!isEqual(comparisonExperiments, prevProps.comparisonExperiments)) {
-        comparisonExperiments.forEach(exp => fetchTraces(exp.id));
+        comparisonExperiments.forEach(expId => fetchTraces(expId));
       }
     }
   }
 
   render() {
-    const { experiment } = this.props;
+    const { experimentId } = this.props;
 
     let inner = null;
-    if(experiment) {
+    if(experimentId != null) {
       inner = (<>
-        <ContentPane experiment={experiment} />
-        <Sidebar />
+        <ContentPane experimentId={experimentId} />
+        <Sidebar experimentId={experimentId} />
       </>);
     }
 
     return (
       <div className={Layout.Wrapper}>
-        <TopBar />
+        <TopBar experimentId={experimentId} />
         <main className={Layout.Main}>{inner}</main>
       </div>
     );
@@ -54,13 +54,9 @@ class Experiment extends React.Component {
 
 
 export default connect(
-  state => {
-    const experiment = state.ui.currentExperiment
-      ? { id: state.ui.currentExperiment }
-      : null;
-    const comparisonExperiments = state.ui.comparisonExperiments.map(id => ({ id }));
-    return { experiment, comparisonExperiments };
-  },
+  state => ({
+    comparisonExperiments: state.ui.comparisonExperiments,
+  }),
   dispatch => ({
     fetchTraces: (...args) => dispatch(traceActions.fetchForExperiment(...args)),
     fetchExperiments: () => dispatch(experimentActions.fetchAll()),

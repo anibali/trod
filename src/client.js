@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import createStore from './store/createStore';
+import createStore, { history } from './store/createStore';
 import ClientRoot from './components/ClientRoot';
 
 
@@ -12,5 +12,5 @@ export default (initialState) => {
 
   // Mount our React root component in the DOM.
   const mountPoint = document.getElementById('root');
-  ReactDOM.render(<ClientRoot store={store} />, mountPoint);
+  ReactDOM.render(<ClientRoot store={store} history={history} />, mountPoint);
 };

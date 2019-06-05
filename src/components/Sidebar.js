@@ -10,7 +10,7 @@ import Collapse from './Collapse';
 import SelectList from './SelectList';
 import SidebarStyle from '../styles/Sidebar.css';
 import { uiActions } from '../store/actions';
-import { getCurrentExperimentTraces } from '../store/selectors';
+import { getExperimentTraces } from '../store/selectors';
 
 import '../styles/rc-slider.global.css';
 
@@ -63,11 +63,11 @@ const Sidebar = (props) => {
 
 
 export default connect(
-  state => {
+  (state, props) => {
     const { comparisonExperiments, smoothingFactor, smoothedTraces } = state.ui;
     const allOtherExperiments = reject(
-      Object.values(state.experiments.byId), { id: state.ui.currentExperiment });
-    const traces = sortBy(getCurrentExperimentTraces(state), 'name');
+      Object.values(state.experiments.byId), { id: props.experimentId });
+    const traces = sortBy(getExperimentTraces(state, props.experimentId), 'name');
     return { comparisonExperiments, allOtherExperiments, smoothingFactor, smoothedTraces, traces };
   },
   dispatch => ({

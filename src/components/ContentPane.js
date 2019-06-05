@@ -11,21 +11,21 @@ import WindowStyle from '../styles/Window.css';
 
 import Window from './Window';
 import { viewActions } from '../store/actions';
-import { getCurrentExperimentViews } from '../store/selectors';
+import { getExperimentViews } from '../store/selectors';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 
 class ContentPane extends Component {
   componentDidMount() {
-    const { fetchViews, experiment } = this.props;
-    fetchViews(experiment.id);
+    const { fetchViews, experimentId } = this.props;
+    fetchViews(experimentId);
   }
 
   componentDidUpdate(prevProps) {
-    const { fetchViews, experiment } = this.props;
-    if(experiment.id !== prevProps.experiment.id) {
-      fetchViews(experiment.id);
+    const { fetchViews, experimentId } = this.props;
+    if(experimentId !== prevProps.experimentId) {
+      fetchViews(experimentId);
     }
   }
 
@@ -42,8 +42,11 @@ class ContentPane extends Component {
     ));
     return (
       <section className={ContentPaneStyle.ContentPane}>
-        <ResponsiveGridLayout style={{ width: '100%' }} rowHeight={100}
-          width={1200} draggableHandle={`.${WindowStyle.TitleBar}`}
+        <ResponsiveGridLayout
+          style={{ width: '100%' }}
+          rowHeight={100}
+          width={1200}
+          draggableHandle={`.${WindowStyle.TitleBar}`}
         >
           {viewComponents}
         </ResponsiveGridLayout>
@@ -54,7 +57,9 @@ class ContentPane extends Component {
 
 
 export default connect(
-  state => ({ views: sortBy(getCurrentExperimentViews(state), 'name') }),
+  (state, props) => ({
+    views: sortBy(getExperimentViews(state, props.experimentId), 'name'),
+  }),
   (dispatch) => ({
     fetchViews: (...args) => dispatch(viewActions.fetchForExperiment(...args)),
   })

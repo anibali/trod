@@ -1,4 +1,5 @@
 import { combineReducers } from 'redux';
+import { connectRouter } from 'connected-react-router';
 
 import { apiReducer as api } from '../../helpers/api';
 import traces from './traceReducer';
@@ -8,7 +9,8 @@ import experiments from './experimentReducer';
 import ui from './uiReducer';
 
 
-export default combineReducers({
+export default history => combineReducers({
+  router: connectRouter(history),
   api,
   traces,
   traceData,

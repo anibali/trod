@@ -6,26 +6,26 @@ import { bisectRight } from 'd3-array';
 import { createSelector } from '../helpers/select';
 
 
-export const getCurrentExperimentViews = createSelector(
+export const getExperimentViews = createSelector(
   [
     state => state.views.byId,
-    state => state.ui.currentExperiment,
+    (state, experimentId) => experimentId,
   ],
-  (views, currentExperiment) => {
+  (views, experimentId) => {
     const groupedViews = groupBy(Object.values(views), 'experiment');
-    return groupedViews[currentExperiment] || [];
+    return groupedViews[experimentId] || [];
   }
 );
 
 
-export const getCurrentExperimentTraces = createSelector(
+export const getExperimentTraces = createSelector(
   [
     state => state.traces.byId,
-    state => state.ui.currentExperiment,
+    (state, experimentId) => experimentId,
   ],
-  (traces, currentExperiment) => {
+  (traces, experimentId) => {
     const groupedTraces = groupBy(Object.values(traces), 'experiment');
-    return groupedTraces[currentExperiment] || [];
+    return groupedTraces[experimentId] || [];
   }
 );
 
@@ -34,11 +34,11 @@ export const getRequiredTraces = createSelector(
   [
     (state, props) => props.view.requiredTraces,
     state => state.ui.comparisonExperiments,
-    state => state.ui.currentExperiment,
+    (state, props) => props.view.experiment,
     state => state.traces.byId,
   ],
-  (requiredTraces, comparisonExperiments, currentExperiment, tracesById) => {
-    const activeExperiments = comparisonExperiments.concat([currentExperiment]);
+  (requiredTraces, comparisonExperiments, experimentId, tracesById) => {
+    const activeExperiments = comparisonExperiments.concat([experimentId]);
     const traces = Object.values(tracesById).filter(trace => requiredTraces.includes(trace.name));
     const groupedTraces = groupBy(traces, 'experiment');
     let filteredTraces = [];

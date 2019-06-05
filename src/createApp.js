@@ -187,13 +187,16 @@ export default async (rootDir) => {
   const distDir = path.resolve(__dirname, '..', 'dist');
   app.use('/assets', express.static(distDir));
 
-  app.get('/', (req, res) => {
+  const serveClientApp = (req, res) => {
     const title = 'Trod';
     const assetManifest = JSON.parse(
       fs.readFileSync(path.join(distDir, 'manifest.json'), 'utf8'));
     const htmlContent = renderHtmlPage(title, assetManifest);
     res.send(htmlContent);
-  });
+  };
+
+  app.get('/', serveClientApp);
+  app.get('/c/*', serveClientApp);
 
   app.get('/experiments', (req, res) => {
     res.json(Object.keys(experimentsState.manifestsByExperiment).map(id => ({ id })));

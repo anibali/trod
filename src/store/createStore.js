@@ -1,8 +1,13 @@
 import * as Redux from 'redux';
 import ReduxThunk from 'redux-thunk';
+import { createBrowserHistory } from 'history';
+import { routerMiddleware } from 'connected-react-router';
 
-import combinedReducers from './reducers';
+import createRootReducer from './reducers';
 import { apiMiddleware } from '../helpers/api';
+
+
+export const history = createBrowserHistory();
 
 
 export default (initialState) => {
@@ -16,7 +21,11 @@ export default (initialState) => {
   }
 
   return Redux.createStore(
-    combinedReducers,
+    createRootReducer(history),
     initialState,
-    composeEnhancers(Redux.applyMiddleware(ReduxThunk, apiMiddleware)));
+    composeEnhancers(Redux.applyMiddleware(
+      routerMiddleware(history),
+      ReduxThunk,
+      apiMiddleware,
+    )));
 };

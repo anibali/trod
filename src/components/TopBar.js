@@ -8,7 +8,7 @@ import TopBarStyle from '../styles/TopBar.css';
 
 function TopBar(props) {
   const {
-    currentExperimentId, allExperiments, setCurrentExperiment,
+    experimentId, allExperiments, setCurrentExperiment,
     setComparisonExperiments
   } = props;
 
@@ -25,7 +25,7 @@ function TopBar(props) {
       <h1 className={TopBarStyle.brand}>Trod</h1>
       <Combobox
         items={items}
-        selectedItem={currentExperimentId}
+        selectedItem={experimentId}
         onChange={onChange}
       />
     </div>
@@ -34,11 +34,9 @@ function TopBar(props) {
 
 
 export default connect(
-  state => {
-    const currentExperimentId = state.ui.currentExperiment;
-    const allExperiments = Object.values(state.experiments.byId);
-    return { currentExperimentId, allExperiments };
-  },
+  state => ({
+    allExperiments: Object.values(state.experiments.byId),
+  }),
   dispatch => ({
     setCurrentExperiment: (...args) => dispatch(uiActions.setCurrentExperiment(...args)),
     setComparisonExperiments: (...args) => dispatch(uiActions.setComparisonExperiments(...args)),

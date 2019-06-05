@@ -5,6 +5,8 @@
  *   - Calls one or more other action creators
  */
 
+import { push } from 'connected-react-router';
+
 import { apiActions } from '../../helpers/api';
 
 
@@ -25,4 +27,9 @@ export const viewActions = {
 
 export const experimentActions = {
   fetchAll: () => apiActions.fetch('/experiments'),
+};
+
+
+export const uiActions = {
+  setCurrentExperiment: experimentId => push(`/c/experiments/${experimentId}`),
 };
