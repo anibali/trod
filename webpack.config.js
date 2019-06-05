@@ -17,9 +17,6 @@ console.assert(possibleModes.includes(mode));
 
 const nodeModulesPath = path.resolve(process.env.NODE_PATH || 'node_modules');
 
-// Supported browsers (in the Browserslist config format).
-const browsers = ['last 2 versions', 'ie >= 9', 'safari >= 7'];
-
 const plugins = {
   any: [
     new webpack.DefinePlugin({
@@ -76,8 +73,8 @@ module.exports = {
               presets: [
                 ['@babel/preset-env', {
                   modules: false,
+                  corejs: '2',
                   useBuiltIns: 'usage',
-                  targets: { browsers }
                 }],
                 '@babel/preset-react'
               ],
@@ -101,7 +98,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              modules: true,
+              modules: 'local',
               localIdentName: '[local]--[hash:base64:9]',
               getLocalIdent: (loaderContext, localIdentName, localName, options) => (
                 loaderContext.resourcePath.endsWith('.global.css')
@@ -114,7 +111,7 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               ident: 'postcss',
-              plugins: [postcssImport(), postcssVariables(), postcssPresetEnv({ browsers })]
+              plugins: [postcssImport(), postcssVariables(), postcssPresetEnv()]
             }
           }
         ]
@@ -126,7 +123,12 @@ module.exports = {
         ],
         use: [
           { loader: MiniCssExtractPlugin.loader },
-          'css-loader',
+          {
+            loader: 'css-loader',
+            options: {
+              modules: 'local',
+            }
+          },
         ]
       },
     ],
