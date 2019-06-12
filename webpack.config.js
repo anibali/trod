@@ -126,7 +126,7 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              modules: 'local',
+              modules: false,
             }
           },
         ]
