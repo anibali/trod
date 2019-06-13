@@ -203,23 +203,38 @@ export default async (rootDir) => {
   });
 
   app.get('/experiments/:experimentId/traces', (req, res) => {
+    const { experimentId } = req.params;
+    if(!(experimentId in experimentsState.manifestsByExperiment)) {
+      res.status(404).json({});
+      return;
+    }
     const traces = Object.values(experimentsState.simpleTracesById)
-      .filter(trace => trace.experiment === req.params.experimentId);
+      .filter(trace => trace.experiment === experimentId);
     res.json(traces);
   });
 
   app.get('/experiments/:experimentId/views', (req, res) => {
-    const manifest = experimentsState.manifestsByExperiment[req.params.experimentId];
+    const { experimentId } = req.params;
+    if(!(experimentId in experimentsState.manifestsByExperiment)) {
+      res.status(404).json({});
+      return;
+    }
+    const manifest = experimentsState.manifestsByExperiment[experimentId];
     const views = manifest.views.map(view => ({
-      id: calcHash(`${req.params.experimentId}/${view.name}`),
-      experiment: req.params.experimentId,
+      id: calcHash(`${experimentId}/${view.name}`),
+      experiment: experimentId,
       ...view,
     }));
     res.json(views);
   });
 
   app.get('/tracedata/:traceDataId', (req, res) => {
-    experimentsState.readTraceData(req.params.traceDataId).then(traceData => {
+    const { traceDataId } = req.params;
+    if(!(traceDataId in experimentsState.traceDataById)) {
+      res.status(404).json({});
+      return;
+    }
+    experimentsState.readTraceData(traceDataId).then(traceData => {
       res.json(traceData);
     });
   });
