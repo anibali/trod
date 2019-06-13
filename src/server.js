@@ -28,7 +28,7 @@ const parseArgs = (argv) => {
 export default (argv) => {
   const args = parseArgs(argv);
 
-  createApp(args.dir).then((app) => {
+  createApp(path.resolve(args.dir)).then((app) => {
     const server = http.createServer(app);
     server.listen(args.port, () => {
       console.log('Server started.');
