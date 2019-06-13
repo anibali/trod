@@ -73,6 +73,7 @@
     "postcss-import": "12.0.1",
     "postcss-loader": "3.0.0",
     "postcss-preset-env": "6.6.0",
+    "string-argv": "^0.3.0",
     "webpack": "4.33.0",
     "webpack-assets-manifest": "3.1.1",
     "webpack-clean-obsolete-chunks": "0.4.0",

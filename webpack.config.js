@@ -1,5 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
+const process = require('process');
+const stringArgv = require('string-argv').default;
 const NodemonPlugin = require('nodemon-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AssetsManifestPlugin = require('webpack-assets-manifest');
@@ -38,6 +40,7 @@ const plugins = {
   development: [
     new NodemonPlugin({
       script: 'src/serverEntry.js',
+      args: stringArgv(process.env.TROD_ARGS),
       watch: [path.resolve('src')],
     }),
     new CleanObsoleteChunksPlugin({ deep: true }),
