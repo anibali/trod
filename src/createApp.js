@@ -252,6 +252,9 @@ export default async (rootDir) => {
     }
     experimentsState.readTraceData(traceDataId).then(traceData => {
       res.json(traceData);
+    }).catch(err => {
+      console.error(err);
+      res.status(500).json({});
     });
   });
 
