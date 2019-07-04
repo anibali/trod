@@ -130,10 +130,14 @@ export const getTraceValues = createSelector(
     });
 
     // Ordering traces by number of data points makes finding common steps faster.
-    traces = sortBy(traces, trace => traceData[trace.traceData].steps.length);
+    const tracesWithSteps = sortBy(
+      traces.filter(trace => traceData[trace.traceData].steps != null),
+      trace => traceData[trace.traceData].steps.length
+    );
+    const tracesWithoutSteps = traces.filter(trace => traceData[trace.traceData].steps == null);
 
-    const stepses = traces.map(trace => traceData[trace.traceData].steps);
-    const valueses = traces.map(trace => {
+    const stepses = tracesWithSteps.map(trace => traceData[trace.traceData].steps);
+    const valueses = tracesWithSteps.map(trace => {
       const { steps, values } = traceData[trace.traceData];
       if(smoothedTraces.includes(trace.name) && values.every(Number.isFinite)) {
         return weightedMovingAverage(steps, values, smoothingFactor);
@@ -160,12 +164,16 @@ export const getTraceValues = createSelector(
         if(indices.length === valueses.length) {
           for(let j = 0; j < valueses.length; ++j) {
             const index = indices[j];
-            const trace = traces[j];
+            const trace = tracesWithSteps[j];
             traceValues[trace.experiment][trace.name].push(valueses[j][index]);
           }
         }
       }
     }
+
+    tracesWithoutSteps.forEach(trace => {
+      traceValues[trace.experiment][trace.name] = traceData[trace.traceData].values;
+    });
 
     return traceValues;
   }

@@ -1,0 +1,15 @@
+.TreeView {
+  font-family: monospace;
+  overflow: auto;
+  position: absolute;
+  top: 6px;
+  bottom: 12px;
+  left: 6px;
+  right: 6px;
+}
+
+.TreeView > ul {
+  height: 100%;
+  margin: 0 !important;
+  padding-left: 6px !important;
+}

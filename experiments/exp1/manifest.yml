@@ -9,6 +9,9 @@ traces:
     data: traces/loss.tsv
   - name: pose
     data: traces/pose.tsv
+  - name: params
+    data: artifacts/my-params.json
+    type: artifact
   derived:
   - name: t
     type: multiplexed
@@ -61,3 +64,7 @@ views:
       hovermode: closest
     snapshotTimescale: step
   type: plotly
+- name: params
+  requiredTraces:
+  - params
+  type: tree

@@ -1,0 +1,9 @@
+{
+  "foo": "something",
+  "bar": [1, 4, 6, 23],
+  "baz": {
+    "paper": "scissors",
+    "scissors": "rock",
+    "rock": "paper"
+  }
+}

@@ -48,7 +48,8 @@ class Window extends React.Component {
         <div className={WindowStyle.Content}>
           {viewComponent}
         </div>
-      </div>);
+      </div>
+    );
   }
 }
 

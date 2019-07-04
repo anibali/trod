@@ -67,17 +67,32 @@ const watchExperiments = (rootDir) => {
     traceDataById: {},
     manifestsByExperiment: {},
     readTraceData: function(traceDataId) {
-      const steps = [];
-      const values = [];
-      const trans = new TraceDataParser();
-      const promise = new Promise((resolve, reject) => {
-        trans.on('data', ([step, value]) => { steps.push(step); values.push(value); });
-        trans.on('end', () => resolve({ id: traceDataId, steps, values }));
-        trans.on('error', reject);
-      });
-      const { filePath } = experimentsState.traceDataById[traceDataId];
-      fs.createReadStream(filePath).pipe(trans);
-      return promise;
+      const { filePath, type } = experimentsState.traceDataById[traceDataId];
+      if(type === 'series') {
+        const steps = [];
+        const values = [];
+        const trans = new TraceDataParser();
+        const promise = new Promise((resolve, reject) => {
+          trans.on('data', ([step, value]) => { steps.push(step); values.push(value); });
+          trans.on('end', () => resolve({ id: traceDataId, type, steps, values }));
+          trans.on('error', reject);
+        });
+        fs.createReadStream(filePath).pipe(trans);
+        return promise;
+      }
+      if(type === 'artifact') {
+        return new Promise((resolve, reject) => {
+          fs.readFile(filePath, 'utf8', (err, contents) => {
+            if(err) {
+              reject(err);
+            } else {
+              const values = JSON.parse(contents);
+              resolve({ id: traceDataId, type, values });
+            }
+          });
+        });
+      }
+      throw new Error(`Unrecognised trace type: ${type}`);
     },
   };
 
@@ -120,6 +135,7 @@ const watchExperiments = (rootDir) => {
             traceDataById[traceDataId] = {
               id: traceDataId,
               filePath: path.join(rootDir, expId, trace.data),
+              type: trace.type || 'series',
             };
           } else {
             traceDataById[traceDataId] = experimentsState.traceDataById[traceDataId];
