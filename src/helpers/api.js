@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { createActions, handleActions } from 'redux-actions';
 import produce from 'immer';
+import flatten from 'lodash/flatten';
 import merge from 'lodash/merge';
 import { matchPath } from 'react-router';
 
@@ -8,7 +9,7 @@ import { matchPath } from 'react-router';
 export const apiActions = createActions({
   API: {
     FETCH: path => ({ path }),
-    SET_ENDPOINT_STATUS: (path, status) => ({ path, status }),
+    SET_ENDPOINT_STATUS: (path, status) => ({ paths: flatten([path]), status }),
     HANDLE_RESPONSE: (path, data) => ({ path, data }),
   }
 }).api;
@@ -20,7 +21,11 @@ const initialState = {
 
 export const apiReducer = handleActions({
   [apiActions.setEndpointStatus]: produce((draft, { payload }) => {
-    merge(draft.endpoints, { [payload.path]: { status: payload.status } });
+    const source = {};
+    payload.paths.forEach(path => {
+      source[path] = { status: payload.status };
+    });
+    merge(draft.endpoints, source);
   }),
 }, initialState);
 

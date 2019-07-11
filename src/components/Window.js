@@ -1,28 +1,28 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import isEqual from 'lodash/isEqual';
 
-import { traceDataActions } from '../store/actions';
+import { traceDataActions, traceActions } from '../store/actions';
 import { getRequiredTraces, getTraceValues } from '../store/selectors';
 import WindowStyle from '../styles/Window.css';
 import { viewComponents } from './traceViews';
 
 
 class Window extends React.Component {
-  componentDidMount() {
-    const { traces, fetchTraceData } = this.props;
-    traces.forEach(trace => {
-      fetchTraceData(trace.traceData);
-    });
+  fetchDataIfNeeded() {
+    const { traces, fetchTraceData, setTraceRequiresDataLoad } = this.props;
+    const tracesRequiringDataLoad = traces.filter(trace => trace.requiresDataLoad);
+    if(tracesRequiringDataLoad.length > 0) {
+      setTraceRequiresDataLoad(tracesRequiringDataLoad.map(trace => trace.id), false);
+      tracesRequiringDataLoad.map(trace => fetchTraceData(trace.traceData));
+    }
   }
 
-  componentDidUpdate(prevProps) {
-    const { traces, fetchTraceData } = this.props;
-    if(!isEqual(traces, prevProps.traces)) {
-      traces.forEach(trace => {
-        fetchTraceData(trace.traceData);
-      });
-    }
+  componentDidMount() {
+    this.fetchDataIfNeeded();
+  }
+
+  componentDidUpdate() {
+    this.fetchDataIfNeeded();
   }
 
   render() {
@@ -60,5 +60,6 @@ export default connect(
   }),
   (dispatch) => ({
     fetchTraceData: (...args) => dispatch(traceDataActions.fetch(...args)),
+    setTraceRequiresDataLoad: (...args) => dispatch(traceActions.setRequiresDataLoad(...args))
   })
 )(Window);

@@ -5,6 +5,8 @@
  *   - Doesn't call other action creators
  */
 
+import flatten from 'lodash/flatten';
+
 import { createActions } from 'redux-actions';
 
 
@@ -16,8 +18,12 @@ const simpleActions = createActions({
       ADD_SMOOTHED_TRACE: traceName => traceName,
       REMOVE_SMOOTHED_TRACE: traceName => traceName,
     },
+    TRACE: {
+      SET_REQUIRES_DATA_LOAD: (traceId, value) => ({ traceIds: flatten([traceId]), value }),
+    }
   }
 });
 
 
 export const uiActions = simpleActions.trod.ui;
+export const traceActions = simpleActions.trod.trace;

@@ -8,10 +8,21 @@
 import { push } from 'connected-react-router';
 
 import { apiActions } from '../../helpers/api';
+import { traceActions as simpleTraceActions } from './simpleActions';
 
 
 export const traceActions = {
   fetchForExperiment: experimentId => apiActions.fetch(`/experiments/${experimentId}/traces`),
+  reloadAllData: () => (dispatch, getState) => {
+    dispatch(apiActions.setEndpointStatus(
+      Object.keys(getState().traceData.byId).map(id => `/tracedata/${id}`),
+      'invalidated'
+    ));
+    dispatch(simpleTraceActions.setRequiresDataLoad(
+      Object.keys(getState().traces.byId),
+      true
+    ));
+  }
 };
 
 
