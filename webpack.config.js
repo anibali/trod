@@ -6,7 +6,6 @@ const NodemonPlugin = require('nodemon-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AssetsManifestPlugin = require('webpack-assets-manifest');
 const CleanObsoleteChunksPlugin = require('webpack-clean-obsolete-chunks');
-const getLocalIdent = require('css-loader/lib/getLocalIdent');
 const postcssImport = require('postcss-import');
 const postcssVariables = require('postcss-css-variables');
 const postcssPresetEnv = require('postcss-preset-env');
@@ -46,6 +45,24 @@ const plugins = {
     new CleanObsoleteChunksPlugin({ deep: true }),
   ],
 };
+
+
+const cssPipeline = ({ modules }) => [
+  { loader: MiniCssExtractPlugin.loader },
+  {
+    loader: 'css-loader',
+    options: {
+      modules,
+    }
+  },
+  {
+    loader: 'postcss-loader',
+    options: {
+      ident: 'postcss',
+      plugins: [postcssImport(), postcssVariables(), postcssPresetEnv()]
+    }
+  }
+];
 
 
 module.exports = {
@@ -92,32 +109,18 @@ module.exports = {
         exclude: [path.resolve('src')],
       },
       {
-        test: /\.css$/,
+        test: /\.global.css$/,
         include: [
           path.resolve('src/styles'),
         ],
-        use: [
-          { loader: MiniCssExtractPlugin.loader },
-          {
-            loader: 'css-loader',
-            options: {
-              modules: 'local',
-              localIdentName: '[local]--[hash:base64:9]',
-              getLocalIdent: (loaderContext, localIdentName, localName, options) => (
-                loaderContext.resourcePath.endsWith('.global.css')
-                  ? localName
-                  : getLocalIdent(loaderContext, localIdentName, localName, options)
-              )
-            }
-          },
-          {
-            loader: 'postcss-loader',
-            options: {
-              ident: 'postcss',
-              plugins: [postcssImport(), postcssVariables(), postcssPresetEnv()]
-            }
-          }
-        ]
+        use: cssPipeline({ modules: false }),
+      },
+      {
+        test: /^((?!\.global).)*css$/,
+        include: [
+          path.resolve('src/styles'),
+        ],
+        use: cssPipeline({ modules: 'local' }),
       },
       {
         test: /\.css$/,
