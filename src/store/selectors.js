@@ -90,7 +90,7 @@ const weightedMovingAverage = (xs, ys, smoothingFactor) => {
         windowYs[j] = ys[lidx];
       } else {
         // Linear interpolation
-        windowYs[j] = ys[lidx] + (x - xs[lidx]) * (ys[ridx] - ys[lidx]) / (xs[ridx] - xs[lidx]);
+        windowYs[j] = ys[lidx] + (x - xs[lidx]) * ((ys[ridx] - ys[lidx]) / (xs[ridx] - xs[lidx]));
       }
     }
     let ySum = 0;

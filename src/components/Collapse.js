@@ -8,11 +8,8 @@ class Collapse extends React.Component {
   constructor(props) {
     super(props);
     this.state = { collapsed: false };
-    this.doCollapse = () => {
-      this.setState({ collapsed: true });
-    };
-    this.doUncollapse = () => {
-      this.setState({ collapsed: false });
+    this.toggleCollapsed = () => {
+      this.setState(state => ({ collapsed: !state.collapsed }));
     };
   }
 
@@ -20,24 +17,20 @@ class Collapse extends React.Component {
     const { children, label } = this.props;
     const { collapsed } = this.state;
 
-    if(collapsed) {
-      return (
-        <div>
-          <span className={CollapseStyle.Label} onClick={this.doUncollapse}>
-            <Icon icon="chevron-right" />
-            <Text size={400}>{label}</Text>
-          </span>
-        </div>
-      );
-    }
-
     return (
       <div>
-        <span className={CollapseStyle.Label} onClick={this.doCollapse}>
-          <Icon icon="chevron-down" />
+        <button
+          type="button"
+          className={CollapseStyle.Label}
+          onClick={this.toggleCollapsed}
+          aria-pressed={!collapsed}
+        >
+          <Icon icon={collapsed ? 'chevron-right' : 'chevron-down'} />
           <Text size={400}>{label}</Text>
-        </span>
-        {children}
+        </button>
+        <div className={collapsed ? 'hidden' : null}>
+          {children}
+        </div>
       </div>
     );
   }

@@ -1,4 +1,8 @@
 .Label {
+    border: none;
+    background-color: transparent;
+    font: inherit;
+    color: inherit;
     display: flex;
     align-items: center;
     padding: 8px 0;

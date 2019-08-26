@@ -37,10 +37,12 @@ class Experiment extends React.Component {
 
     let inner = null;
     if(experimentId != null) {
-      inner = (<>
-        <ContentPane experimentId={experimentId} />
-        <Sidebar experimentId={experimentId} />
-      </>);
+      inner = (
+        <>
+          <ContentPane experimentId={experimentId} />
+          <Sidebar experimentId={experimentId} />
+        </>
+      );
     }
 
     return (

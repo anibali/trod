@@ -46,7 +46,8 @@ class PlotlyView extends React.PureComponent {
   render() {
     const { PlotlyComponent } = this;
     const { contentRect, measureRef, view, traceValues } = this.props;
-    let { width, height } = contentRect.bounds;
+    let { height } = contentRect.bounds;
+    const { width } = contentRect.bounds;
     const { timeInstant } = this.state;
 
     let slider = null;
@@ -95,7 +96,9 @@ class PlotlyView extends React.PureComponent {
     specTemplates.forEach((specTemplate) => {
       Object.entries(traceValues).forEach(([expId, vs]) => {
         // Substitute trace values into the Plotly spec.
-        const patch = specTemplate.injectTraces.flatMap(({ path, trace, field, snapshot, gather }) => {
+        const patch = specTemplate.injectTraces.flatMap(({
+          path, trace, field, snapshot, gather
+        }) => {
           let value = vs[trace];
           if(value == null) {
             return [];

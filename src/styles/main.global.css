@@ -8,3 +8,7 @@ body {
   color: var(--neutral-base);
   font-family: var(--font-ui);
 }
+
+.hidden {
+  display: none;
+}

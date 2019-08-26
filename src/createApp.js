@@ -26,13 +26,14 @@ class TraceDataParser extends Transform {
     this.key = null;
   }
 
+  // eslint-disable-next-line no-underscore-dangle
   _transform(chunk, encoding, callback) {
     const newChunk = this.buffer2.slice(0, this.bufLen + chunk.length);
     this.buffer.copy(newChunk, 0, 0, this.bufLen);
     chunk.copy(newChunk, this.bufLen);
     chunk = newChunk;
     let chunkPos = 0;
-    while(true) {
+    for(;;) {
       if(this.key == null) {
         // Parse key (step).
         const tabIndex = chunk.indexOf('\t', chunkPos);

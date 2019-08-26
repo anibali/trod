@@ -43,7 +43,6 @@ class ContentPane extends Component {
     return (
       <section className={ContentPaneStyle.ContentPane}>
         <ResponsiveGridLayout
-          style={{ width: '100%' }}
           rowHeight={100}
           width={1200}
           draggableHandle={`.${WindowStyle.TitleBar}`}
