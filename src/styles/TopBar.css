@@ -16,3 +16,8 @@
 .brand {
   padding-right: 24px;
 }
+
+.brand a {
+  text-decoration: inherit;
+  color: inherit;
+}

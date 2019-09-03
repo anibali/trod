@@ -26,7 +26,7 @@ function TopBar(props) {
 
   return (
     <div className={TopBarStyle.TopBar}>
-      <h1 className={TopBarStyle.brand}>Trod</h1>
+      <h1 className={TopBarStyle.brand}><a href="/">Trod</a></h1>
       <Combobox
         items={items}
         selectedItem={experimentId}
