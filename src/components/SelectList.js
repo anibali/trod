@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkbox, Pane, Table } from 'evergreen-ui';
+import { Checkbox, Pane, Table, Tooltip } from 'evergreen-ui';
 
 
 const SelectListItem = React.memo(({ label, value, selected, onSelect, onDeselect }) => {
@@ -17,7 +17,9 @@ const SelectListItem = React.memo(({ label, value, selected, onSelect, onDeselec
       <Table.Cell flexBasis={40} flexGrow={0}>
         <Checkbox checked={selected} onChange={selectionHandler} />
       </Table.Cell>
-      <Table.TextCell>{label}</Table.TextCell>
+      <Tooltip content={label}>
+        <Table.TextCell>{label}</Table.TextCell>
+      </Tooltip>
     </Table.Row>
   );
 });
