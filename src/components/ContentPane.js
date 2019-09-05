@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import sortBy from 'lodash/sortBy';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-import { Spinner } from 'evergreen-ui';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -12,7 +11,7 @@ import WindowStyle from '../styles/Window.css';
 
 import Window from './Window';
 import { viewActions } from '../store/actions';
-import { getExperimentViews, getActiveApiRequestCount } from '../store/selectors';
+import { getExperimentViews } from '../store/selectors';
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -31,11 +30,7 @@ class ContentPane extends Component {
   }
 
   render() {
-    const { views, nActiveRequests } = this.props;
-
-    if(nActiveRequests > 0) {
-      return <section className={ContentPaneStyle.ContentPane}><Spinner /></section>;
-    }
+    const { views } = this.props;
 
     const viewComponents = views.map((view, i) => (
       <div
@@ -64,7 +59,6 @@ class ContentPane extends Component {
 export default connect(
   (state, props) => ({
     views: sortBy(getExperimentViews(state, props.experimentId), 'name'),
-    nActiveRequests: getActiveApiRequestCount(state),
   }),
   (dispatch) => ({
     fetchViews: (...args) => dispatch(viewActions.fetchForExperiment(...args)),

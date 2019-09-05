@@ -1,8 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Spinner } from 'evergreen-ui';
 
 import { traceDataActions, traceActions } from '../store/actions';
-import { getRequiredTraces, getTraceValues } from '../store/selectors';
+import { getRequiredTraces, getTraceValues, getActiveApiRequestCount } from '../store/selectors';
 import WindowStyle from '../styles/Window.css';
 import { viewComponents } from './traceViews';
 
@@ -26,10 +27,14 @@ class Window extends React.Component {
   }
 
   render() {
-    const { traceValues, view } = this.props;
+    const { traceValues, view, nActiveRequests } = this.props;
 
     let viewComponent = null;
-    if(Object.prototype.hasOwnProperty.call(viewComponents, view.type)) {
+    if(nActiveRequests > 0) {
+      viewComponent = (
+        <Spinner className={WindowStyle.Centred} />
+      );
+    } else if(Object.prototype.hasOwnProperty.call(viewComponents, view.type)) {
       const ViewComponent = viewComponents[view.type];
       viewComponent = <ViewComponent view={view} traceValues={traceValues} />;
     } else {
@@ -57,6 +62,7 @@ export default connect(
   (state, props) => ({
     traces: getRequiredTraces(state, props),
     traceValues: getTraceValues(state, props),
+    nActiveRequests: getActiveApiRequestCount(state),
   }),
   (dispatch) => ({
     fetchTraceData: (...args) => dispatch(traceDataActions.fetch(...args)),
