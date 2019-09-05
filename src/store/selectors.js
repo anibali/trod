@@ -178,3 +178,13 @@ export const getTraceValues = createSelector(
     return traceValues;
   }
 );
+
+
+export const getActiveApiRequestCount = createSelector(
+  [
+    state => state.api.endpoints,
+  ],
+  (endpoints) => {
+    return Object.values(endpoints).filter(e => e.status === 'requested').length;
+  }
+);
